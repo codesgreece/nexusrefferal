@@ -36,7 +36,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-2xl border bg-surface/80 p-5 shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-500/35",
+        "group relative min-w-0 overflow-hidden rounded-2xl border bg-surface/80 p-4 shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-500/35 sm:p-5",
         toneRing,
         className,
       )}
@@ -45,8 +45,8 @@ export function StatCard({
         aria-hidden
         className="pointer-events-none absolute -right-12 -top-12 size-32 rounded-full bg-violet-600/12 blur-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
       />
-      <div className="relative flex items-start justify-between gap-3">
-        <p className="text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-muted-2">
+      <div className="relative flex items-start justify-between gap-2 sm:gap-3">
+        <p className="min-w-0 text-[0.62rem] font-semibold uppercase leading-snug tracking-[0.1em] text-muted-2 sm:text-[0.7rem] sm:tracking-[0.12em]">
           {label}
         </p>
         {icon ? (
@@ -55,7 +55,7 @@ export function StatCard({
           </span>
         ) : null}
       </div>
-      <p className="relative mt-3 text-2xl font-semibold tracking-tight text-ink tabular-nums sm:text-[1.75rem]">
+      <p className="relative mt-2 break-words text-xl font-semibold tracking-tight text-ink tabular-nums sm:mt-3 sm:text-[1.75rem]">
         {value}
       </p>
       {sublabel ? (
@@ -77,7 +77,7 @@ export function StatGrid({
   return (
     <div
       className={cn(
-        "grid gap-4",
+        "grid min-w-0 gap-3 sm:gap-4",
         cols === 2 && "sm:grid-cols-2",
         cols === 3 && "sm:grid-cols-2 lg:grid-cols-3",
         cols === 4 && "grid-cols-2 lg:grid-cols-4",

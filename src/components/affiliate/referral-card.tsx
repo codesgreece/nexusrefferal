@@ -54,20 +54,20 @@ export function ReferralCard({
   };
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-violet-500/28 bg-linear-to-br from-violet-800/22 via-surface to-surface p-5 shadow-glow-sm sm:p-6">
+    <div className="relative overflow-hidden rounded-2xl border border-violet-500/28 bg-linear-to-br from-violet-800/22 via-surface to-surface p-4 shadow-glow-sm sm:p-6">
       <div
         aria-hidden
         className="pointer-events-none absolute -right-20 -top-20 size-56 rounded-full bg-violet-600/20 blur-[70px]"
       />
 
       <div className="relative grid gap-5 lg:grid-cols-[1fr_1.2fr] lg:items-start">
-        <div>
+        <div className="min-w-0">
           <p className="flex items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-violet-300/85">
-            <Ticket className="size-3.5" />
+            <Ticket className="size-3.5 shrink-0" />
             {t("affiliate.referral.title")}
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-3">
-            <p className="font-mono text-3xl font-semibold tracking-[0.18em] text-violet-100 sm:text-4xl">
+            <p className="break-all font-mono text-2xl font-semibold tracking-[0.12em] text-violet-100 sm:text-4xl sm:tracking-[0.18em]">
               {code}
             </p>
             <CopyButton value={code} size="sm" />
@@ -82,12 +82,12 @@ export function ReferralCard({
           ) : null}
         </div>
 
-        <div className="space-y-3 border-t border-white/8 pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+        <div className="min-w-0 space-y-3 border-t border-white/8 pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
           <p className="flex items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-violet-300/85">
-            <Link2 className="size-3.5" />
+            <Link2 className="size-3.5 shrink-0" />
             {t("affiliate.referral.linkTitle")}
           </p>
-          <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-void/50 px-3 py-2.5">
+          <div className="flex min-w-0 items-center gap-2 rounded-xl border border-white/10 bg-void/50 px-3 py-2.5">
             <code className="min-w-0 flex-1 truncate font-mono text-xs text-ink/90">
               {referralUrl}
             </code>

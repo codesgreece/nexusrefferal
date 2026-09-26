@@ -48,7 +48,7 @@ export function CardHeader({
         ) : null}
         <div className="min-w-0 space-y-1">
           {title ? (
-            <h2 className="truncate text-base font-semibold text-ink">{title}</h2>
+            <h2 className="text-base font-semibold leading-snug text-ink">{title}</h2>
           ) : null}
           {description ? (
             <p className="text-sm leading-relaxed text-muted">{description}</p>

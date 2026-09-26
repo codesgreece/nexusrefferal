@@ -22,16 +22,18 @@ function PriceTag({
   fromLabel: string;
 }) {
   return (
-    <div className="flex items-end gap-1.5">
+    <div className="flex flex-wrap items-end gap-1.5">
       {priceFrom ? (
-        <span className="mb-1.5 text-xs font-medium uppercase tracking-wider text-muted-2">
+        <span className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-2 sm:mb-1.5">
           {fromLabel}
         </span>
       ) : null}
-      <span className="text-4xl font-semibold tracking-tight text-ink tabular-nums">
+      <span className="text-3xl font-semibold tracking-tight text-ink tabular-nums sm:text-4xl">
         {formatMoney(cents, locale)}
       </span>
-      {priceFrom ? <span className="mb-1.5 text-2xl font-semibold text-violet-400">+</span> : null}
+      {priceFrom ? (
+        <span className="mb-1 text-xl font-semibold text-violet-400 sm:mb-1.5 sm:text-2xl">+</span>
+      ) : null}
     </div>
   );
 }
@@ -52,7 +54,7 @@ export function PricingSection({
   return (
     <section
       id="pricing"
-      className="relative scroll-mt-20 border-t border-white/6 py-20 sm:py-24"
+      className="relative scroll-mt-20 overflow-x-clip border-t border-white/6 py-16 sm:py-24"
     >
       <div
         aria-hidden
@@ -65,14 +67,14 @@ export function PricingSection({
           subtitle={t("landing.pricingSubtitle")}
         />
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:mt-12 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
           {services.map((service, index) => {
             const featured = index === featuredIndex;
             return (
               <article
                 key={service.id}
                 className={cn(
-                  "group relative flex flex-col overflow-hidden rounded-3xl border p-6 transition-all duration-300 hover:-translate-y-1",
+                  "group relative flex min-w-0 flex-col overflow-hidden rounded-3xl border p-5 transition-all duration-300 hover:-translate-y-1 sm:p-6",
                   featured
                     ? "border-violet-500/45 bg-linear-to-b from-violet-800/22 via-surface to-surface shadow-glow"
                     : "border-white/8 bg-surface/70 hover:border-violet-500/30 hover:shadow-glow-sm",
@@ -143,7 +145,7 @@ export function PricingSection({
             );
           })}
 
-          <article className="relative flex flex-col justify-center gap-3 rounded-3xl border border-dashed border-white/12 bg-white/[0.015] p-6">
+          <article className="relative flex min-w-0 flex-col justify-center gap-3 rounded-3xl border border-dashed border-white/12 bg-white/[0.015] p-5 sm:p-6">
             <span className="grid size-11 place-items-center rounded-xl border border-violet-500/28 bg-violet-500/10 text-violet-300">
               <Globe className="size-5" />
             </span>
@@ -151,7 +153,7 @@ export function PricingSection({
               <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">
                 {t("landing.pricingDomain")}
               </h3>
-              <p className="mt-3 text-3xl font-semibold tracking-tight text-ink tabular-nums">
+              <p className="mt-3 text-2xl font-semibold tracking-tight text-ink tabular-nums sm:text-3xl">
                 +{formatMoney(domainFeeCents, locale)}
               </p>
               <p className="mt-2 text-sm leading-relaxed text-muted">

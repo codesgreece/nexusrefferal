@@ -40,16 +40,16 @@ export function Logo({
   return (
     <Link
       href={href}
-      className={cn("group flex items-center gap-2.5 outline-none", className)}
+      className={cn("group flex min-w-0 items-center gap-2.5 outline-none", className)}
       aria-label="NexusDevStudio Affiliates"
     >
       <LogoMark className="transition-transform duration-300 group-hover:scale-105" />
-      <span className="flex flex-col leading-none">
-        <span className="text-[0.95rem] font-semibold tracking-tight text-ink">
+      <span className="flex min-w-0 flex-col leading-none">
+        <span className="truncate text-[0.85rem] font-semibold tracking-tight text-ink sm:text-[0.95rem]">
           Nexus<span className="text-violet-300">Dev</span>Studio
         </span>
         {showProgram ? (
-          <span className="mt-0.5 text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-violet-400/80">
+          <span className="mt-0.5 truncate text-[0.55rem] font-semibold uppercase tracking-[0.22em] text-violet-400/80 sm:text-[0.6rem] sm:tracking-[0.28em]">
             Affiliates
           </span>
         ) : null}

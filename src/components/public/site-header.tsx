@@ -51,8 +51,8 @@ export function SiteHeader({
           : "border-b border-transparent",
       )}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <Logo />
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 lg:px-8">
+        <Logo className="min-w-0" />
 
         <nav className="hidden items-center gap-1 lg:flex">
           {SECTIONS.map((section) => (
@@ -84,7 +84,7 @@ export function SiteHeader({
           )}
         </div>
 
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex shrink-0 items-center gap-2 lg:hidden">
           <LanguageSwitcher compact />
           <button
             type="button"

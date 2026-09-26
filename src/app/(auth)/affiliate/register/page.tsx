@@ -15,7 +15,7 @@ export default async function RegisterPage() {
 
   if (!settings.programActive) {
     return (
-      <Card glow className="w-full max-w-md">
+      <Card glow className="w-full max-w-md min-w-0">
         <CardHeader title={t("auth.registerTitle")} />
         <CardBody className="space-y-4">
           <FormAlert tone="warning" message={t("landing.programPaused")} />
@@ -28,7 +28,7 @@ export default async function RegisterPage() {
   }
 
   return (
-    <Card glow className="my-4 w-full max-w-3xl">
+    <Card glow className="my-4 w-full max-w-3xl min-w-0 overflow-hidden">
       <CardHeader
         title={t("auth.registerTitle")}
         description={t("auth.registerSubtitle")}

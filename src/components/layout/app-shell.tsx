@@ -185,7 +185,7 @@ export function AppShell({
   );
 
   return (
-    <div className="min-h-dvh bg-void">
+    <div className="min-h-dvh max-w-[100vw] overflow-x-clip bg-void">
       <div
         aria-hidden
         className="pointer-events-none fixed -left-40 -top-40 size-[30rem] rounded-full bg-violet-800/12 blur-[130px]"
@@ -202,10 +202,10 @@ export function AppShell({
         </div>
       </aside>
 
-      <div className="lg:pl-64">
+      <div className="min-w-0 lg:pl-64">
         {/* Header */}
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-white/8 bg-void/85 px-4 backdrop-blur-xl sm:px-6">
-          <div className="flex min-w-0 items-center gap-3">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-2 border-b border-white/8 bg-void/85 px-3 backdrop-blur-xl sm:gap-3 sm:px-6">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
@@ -214,12 +214,12 @@ export function AppShell({
             >
               <Menu className="size-4" />
             </button>
-            <div className="lg:hidden">
+            <div className="min-w-0 lg:hidden">
               <Logo href={homeHref} showProgram={false} />
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <LanguageSwitcher compact />
             <NotificationBell
               notifications={notifications}
@@ -261,8 +261,8 @@ export function AppShell({
           </div>
         ) : null}
 
-        <main className="px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-12">
-          <div className="mx-auto max-w-7xl">{children}</div>
+        <main className="min-w-0 px-3 pb-28 pt-5 sm:px-6 sm:pt-6 lg:px-8 lg:pb-12">
+          <div className="mx-auto w-full min-w-0 max-w-7xl">{children}</div>
         </main>
       </div>
 
@@ -272,17 +272,17 @@ export function AppShell({
           {bottomNav.slice(0, 5).map((item) => {
             const active = isActive(pathname, item);
             return (
-              <li key={item.href}>
+              <li key={item.href} className="min-w-0">
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "relative flex flex-col items-center gap-1 px-1 py-2.5 text-[0.62rem] transition-colors",
+                    "relative flex flex-col items-center gap-1 px-0.5 py-2.5 text-[0.58rem] leading-tight transition-colors sm:text-[0.62rem]",
                     active ? "text-violet-300" : "text-muted-2",
                   )}
                 >
                   {active ? (
-                    <span className="absolute inset-x-4 top-0 h-0.5 rounded-full bg-violet-400" />
+                    <span className="absolute inset-x-3 top-0 h-0.5 rounded-full bg-violet-400 sm:inset-x-4" />
                   ) : null}
                   <span className="relative [&_svg]:size-5">
                     {item.icon}
@@ -292,7 +292,7 @@ export function AppShell({
                       </span>
                     ) : null}
                   </span>
-                  <span className="max-w-full truncate">{t(item.labelKey)}</span>
+                  <span className="max-w-full truncate px-0.5 text-center">{t(item.labelKey)}</span>
                 </Link>
               </li>
             );
@@ -313,16 +313,18 @@ export function PageHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-      <div className="min-w-0 space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-[1.75rem]">
+    <div className="mb-5 flex flex-wrap items-end justify-between gap-3 sm:mb-6 sm:gap-4">
+      <div className="min-w-0 flex-1 space-y-1">
+        <h1 className="text-xl font-semibold tracking-tight text-ink sm:text-[1.75rem]">
           {title}
         </h1>
         {description ? (
           <p className="text-sm leading-relaxed text-muted">{description}</p>
         ) : null}
       </div>
-      {action ? <div className="flex flex-wrap items-center gap-2">{action}</div> : null}
+      {action ? (
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">{action}</div>
+      ) : null}
     </div>
   );
 }

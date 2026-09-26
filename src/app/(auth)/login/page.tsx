@@ -22,7 +22,7 @@ export default async function LoginPage({
   const { t } = await getI18n();
 
   return (
-    <Card glow className="w-full max-w-md">
+    <Card glow className="w-full max-w-md min-w-0">
       <CardHeader title={t("auth.loginTitle")} description={t("auth.loginSubtitle")} />
       <CardBody>
         <LoginForm next={next} />
