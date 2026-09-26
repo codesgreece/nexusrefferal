@@ -120,10 +120,15 @@ Two scripts check the application against a running dev server. Both clean up
 after themselves, so neither leaves demo data behind.
 
 ```bash
-npm run dev          # in one terminal
-npm run test:e2e     # the business flow, end to end
-npm run test:routes  # every route, both languages, both roles
+npm run dev           # in one terminal
+npm run test:e2e      # the business flow, end to end
+npm run test:routes   # every route, both languages, both roles
+npm run test:actions  # the server action boundary: auth, validation, CSRF
+npm run test:logout   # signing out really destroys the session
 ```
+
+Point any of them at a deployment with `E2E_BASE_URL`, together with that
+deployment's `DATABASE_URL`.
 
 `test:e2e` walks the full specified flow through the real service layer and the
 real HTTP surface: registration, an unapproved affiliate being held out of the
@@ -139,10 +144,17 @@ refund cancelling an unpaid commission, and suspension stopping new
 attribution. It also asserts an affiliate cannot reach admin pages and is
 offered no approve control on their own commissions.
 
-`test:routes` requests all 34 routes as an administrator, as an approved
+`test:routes` requests every route as an administrator, as an approved
 affiliate and anonymously — including filtered and paginated variants and both
 locales — and asserts none render an error boundary, that cross-role access
 redirects, and that the security headers are present.
+
+`test:actions` posts to a server action endpoint directly, reading the action
+id out of the bundle the target serves, and asserts that an anonymous request
+is unauthorized, an affiliate's request is forbidden, a request from a foreign
+origin is refused, and an invalid payload fails validation rather than partly
+applying. `test:logout` does the same for signing out and then confirms the
+session row is gone and the old cookie no longer opens either dashboard.
 
 ## Scripts
 

@@ -34,6 +34,69 @@ async function actorFor(userId: string): Promise<Actor> {
   };
 }
 
+export async function registerAffiliateVia(input: {
+  fullName: string;
+  email: string;
+  phone: string;
+  dateOfBirth: Date;
+  bio: string;
+  motivation: string;
+  password: string;
+  tiktok?: string;
+}) {
+  const { registerAffiliate } = await import("../src/lib/services/affiliates");
+  return registerAffiliate({
+    fullName: input.fullName,
+    email: input.email,
+    phone: input.phone,
+    dateOfBirth: input.dateOfBirth,
+    bio: input.bio,
+    motivation: input.motivation,
+    password: input.password,
+    confirmPassword: input.password,
+    adultConfirm: true,
+    acceptTerms: true,
+    acceptPrivacy: true,
+    locale: "el",
+    tiktok: input.tiktok,
+    instagram: undefined,
+    facebook: undefined,
+    youtube: undefined,
+  });
+}
+
+export async function approveAffiliateVia(
+  affiliateId: string,
+  referralCode: string,
+  adminUserId: string,
+) {
+  const { approveAffiliate } = await import("../src/lib/services/affiliates");
+  return approveAffiliate(await actorFor(adminUserId), { affiliateId, referralCode });
+}
+
+export async function suspendAffiliateVia(
+  affiliateId: string,
+  adminUserId: string,
+  reason: string,
+) {
+  const { suspendAffiliate } = await import("../src/lib/services/affiliates");
+  return suspendAffiliate(await actorFor(adminUserId), { affiliateId, reason });
+}
+
+export async function reactivateAffiliateVia(affiliateId: string, adminUserId: string) {
+  const { reactivateAffiliate } = await import("../src/lib/services/affiliates");
+  return reactivateAffiliate(await actorFor(adminUserId), affiliateId);
+}
+
+export async function changeReferralCodeVia(
+  affiliateId: string,
+  referralCode: string,
+  adminUserId: string,
+) {
+  const { changeReferralCode } = await import("../src/lib/services/affiliates");
+  return changeReferralCode(await actorFor(adminUserId), { affiliateId, referralCode });
+}
+
 export async function submitPublicLead(input: {
   customerName: string;
   businessName?: string;

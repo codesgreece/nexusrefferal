@@ -157,34 +157,55 @@ async function main() {
 
   // --- registration --------------------------------------------------------
   section("Affiliate registration");
-  const user = await prisma.user.create({
-    data: {
-      email: AFFILIATE_EMAIL,
-      passwordHash: await import("bcryptjs").then((m) => m.default.hash(AFFILIATE_PASSWORD, 12)),
-      role: "AFFILIATE",
-      name: "Maria E2E",
-      locale: "el",
-    },
+  const { registerAffiliateVia } = await import("./e2e-helpers");
+  const registration = await registerAffiliateVia({
+    fullName: "Maria E2E",
+    email: AFFILIATE_EMAIL,
+    phone: AFFILIATE_PHONE,
+    dateOfBirth: new Date("1996-04-12"),
+    bio: "Creator focused on small local businesses.",
+    motivation: "I already get asked about websites every week.",
+    password: AFFILIATE_PASSWORD,
+    tiktok: "maria.e2e",
   });
-  const affiliate = await prisma.affiliate.create({
-    data: {
-      userId: user.id,
-      status: "PENDING",
-      fullName: "Maria E2E",
-      email: AFFILIATE_EMAIL,
-      phone: AFFILIATE_PHONE,
-      dateOfBirth: new Date("1996-04-12"),
-      bio: "Creator focused on small local businesses.",
-      motivation: "I already get asked about websites every week.",
-      confirmedAdult: true,
-      acceptedTermsAt: new Date(),
-      acceptedPrivacyAt: new Date(),
-      socialProfiles: {
-        create: [{ platform: "TIKTOK", handle: "maria.e2e", url: "https://www.tiktok.com/@maria.e2e" }],
-      },
-    },
+  const user = await prisma.user.findUniqueOrThrow({ where: { email: AFFILIATE_EMAIL } });
+  const affiliate = await prisma.affiliate.findUniqueOrThrow({
+    where: { id: registration.affiliate.id },
+    include: { socialProfiles: true },
   });
   check("affiliate created with PENDING status", affiliate.status === "PENDING");
+  check("terms and privacy acceptance recorded", Boolean(affiliate.acceptedTermsAt));
+  check("18+ confirmation recorded", affiliate.confirmedAdult);
+  check(
+    "social handle normalized to a full URL",
+    affiliate.socialProfiles[0]?.url === "https://www.tiktok.com/@maria.e2e",
+    affiliate.socialProfiles[0]?.url,
+  );
+  check(
+    "password is stored hashed, never in plain text",
+    user.passwordHash !== AFFILIATE_PASSWORD && user.passwordHash.startsWith("$2"),
+  );
+  check(
+    "registering the same email twice is refused",
+    (await registerAffiliateVia({
+      fullName: "Maria Duplicate",
+      email: AFFILIATE_EMAIL,
+      phone: `+3064${String(stamp).slice(-8)}`,
+      dateOfBirth: new Date("1996-04-12"),
+      bio: "duplicate",
+      motivation: "duplicate",
+      password: AFFILIATE_PASSWORD,
+      tiktok: "dupe.e2e",
+    })
+      .then(() => "created")
+      .catch((error: { key?: string }) => error.key)) === "errors.emailTaken",
+  );
+  check(
+    "administrators are notified of the new application",
+    (await prisma.notification.count({
+      where: { type: "ADMIN_NEW_APPLICATION" },
+    })) > 0,
+  );
 
   const pendingSession = new Session("maria-pending");
   const loginPending = await pendingSession.fetch("/login", { method: "GET" });
@@ -213,24 +234,60 @@ async function main() {
   // --- approval ------------------------------------------------------------
   section("Admin approval and referral code");
   const admin = await prisma.user.findFirstOrThrow({ where: { role: "ADMIN" } });
-  await prisma.$transaction(async (tx) => {
-    await tx.affiliate.update({
-      where: { id: affiliate.id },
-      data: { status: "ACTIVE", approvedAt: new Date(), approvedById: admin.id },
-    });
-    await tx.referralCode.create({
-      data: { code: REFERRAL_CODE, affiliateId: affiliate.id, isPrimary: true, isActive: true },
-    });
-    await tx.notification.create({
-      data: {
-        userId: user.id,
-        type: "AFFILIATE_APPROVED",
-        paramsJson: JSON.stringify({ code: REFERRAL_CODE }),
-        link: "/affiliate/dashboard",
-        severity: "SUCCESS",
-      },
-    });
+  const { approveAffiliateVia, changeReferralCodeVia } = await import("./e2e-helpers");
+
+  // Approval goes through the real service, including code normalization,
+  // notification and audit logging.
+  const approval = await approveAffiliateVia(
+    affiliate.id,
+    REFERRAL_CODE.toLowerCase(),
+    admin.id,
+  );
+  check("approval returned the normalized code", approval.code === REFERRAL_CODE);
+  const approvedAffiliate = await prisma.affiliate.findUniqueOrThrow({
+    where: { id: affiliate.id },
+    include: { referralCodes: true },
   });
+  check("affiliate is ACTIVE", approvedAffiliate.status === "ACTIVE");
+  check("approver recorded on the affiliate", approvedAffiliate.approvedById === admin.id);
+  check("referral code stored upper-cased", approvedAffiliate.referralCodes[0]?.code === REFERRAL_CODE);
+  check("referral code is active", approvedAffiliate.referralCodes[0]?.isActive === true);
+  check(
+    "approval written to the audit log",
+    (await prisma.auditLog.count({
+      where: { action: "AFFILIATE_APPROVED", entityId: affiliate.id },
+    })) === 1,
+  );
+  check(
+    "an invalid code shape is refused",
+    (await changeReferralCodeVia(affiliate.id, "ab", admin.id)
+      .then(() => "changed")
+      .catch((error: { key?: string }) => error.key)) === "errors.validation",
+  );
+
+  // A second affiliate lets us prove the uniqueness rule is enforced.
+  const rivalEmail = `rival.e2e.${stamp}@example.com`;
+  const rival = await registerAffiliateVia({
+    fullName: "Rival E2E",
+    email: rivalEmail,
+    phone: `+3063${String(stamp).slice(-8)}`,
+    dateOfBirth: new Date("1992-06-06"),
+    bio: "Second applicant.",
+    motivation: "Also wants to promote.",
+    password: AFFILIATE_PASSWORD,
+    tiktok: "rival.e2e",
+  });
+  check(
+    "a code already held by another affiliate is refused",
+    (await approveAffiliateVia(rival.affiliate.id, REFERRAL_CODE, admin.id)
+      .then(() => "approved")
+      .catch((error: { key?: string }) => error.key)) === "errors.referralCodeTaken",
+  );
+  check(
+    "the rejected approval left the rival PENDING",
+    (await prisma.affiliate.findUniqueOrThrow({ where: { id: rival.affiliate.id } }))
+      .status === "PENDING",
+  );
 
   const activeDashboard = await pendingSession.fetch("/affiliate/dashboard");
   const dashboardHtml = await activeDashboard.text();
@@ -776,17 +833,21 @@ async function main() {
   );
 
   // --- suspension stops attribution ---------------------------------------
-  section("Suspension stops new attribution");
-  await prisma.$transaction(async (tx) => {
-    await tx.affiliate.update({
-      where: { id: affiliate.id },
-      data: { status: "SUSPENDED", suspendedAt: new Date(), suspensionReason: "E2E check" },
-    });
-    await tx.referralCode.updateMany({
-      where: { affiliateId: affiliate.id },
-      data: { isActive: false, disabledAt: new Date() },
-    });
+  section("Suspension and reactivation");
+  const { suspendAffiliateVia, reactivateAffiliateVia } = await import("./e2e-helpers");
+
+  await suspendAffiliateVia(affiliate.id, admin.id, "E2E check");
+  const suspended = await prisma.affiliate.findUniqueOrThrow({
+    where: { id: affiliate.id },
+    include: { referralCodes: true },
   });
+  check("affiliate is SUSPENDED", suspended.status === "SUSPENDED");
+  check("suspension reason stored", suspended.suspensionReason === "E2E check");
+  check("referral code disabled", suspended.referralCodes[0]?.isActive === false);
+  check(
+    "active sessions were revoked",
+    (await prisma.session.count({ where: { userId: user.id } })) === 0,
+  );
   const suspendedResolve = await resolveCodeViaDb(REFERRAL_CODE);
   check("suspended affiliate's code no longer resolves", suspendedResolve === null);
 
@@ -797,6 +858,27 @@ async function main() {
     !suspendedLocation.includes("ref="),
     suspendedLocation,
   );
+  check(
+    "a suspended affiliate cannot be attributed a new lead",
+    (await submitPublicLead({
+      customerName: "After Suspension",
+      email: `suspended.lead.e2e.${stamp}@example.com`,
+      message: "Trying a suspended code.",
+      referralCode: REFERRAL_CODE,
+    })
+      .then(() => "created")
+      .catch((error: { key?: string }) => error.key)) === "errors.referralCodeInvalid",
+  );
+
+  await reactivateAffiliateVia(affiliate.id, admin.id);
+  const reactivated = await prisma.affiliate.findUniqueOrThrow({
+    where: { id: affiliate.id },
+    include: { referralCodes: true },
+  });
+  check("affiliate is ACTIVE again", reactivated.status === "ACTIVE");
+  check("suspension reason cleared", reactivated.suspensionReason === null);
+  check("referral code re-enabled", reactivated.referralCodes[0]?.isActive === true);
+  check("the code resolves again", (await resolveCodeViaDb(REFERRAL_CODE)) === affiliate.id);
 
   // --- cleanup -------------------------------------------------------------
   section("Cleanup");
@@ -811,10 +893,22 @@ async function main() {
     prisma.customer.deleteMany({ where: { email: { contains: ".e2e." } } }),
     prisma.referralClick.deleteMany({ where: { affiliateId: affiliate.id } }),
     prisma.auditLog.deleteMany({ where: { actorUserId: user.id } }),
-    prisma.user.delete({ where: { id: user.id } }),
   ]);
-  const leftovers = await prisma.affiliate.count({ where: { email: AFFILIATE_EMAIL } });
-  check("test data removed", leftovers === 0);
+  // Removes the applicant, the rival applicant and anything else this run made.
+  const created = await prisma.user.findMany({
+    where: { email: { contains: ".e2e." } },
+    select: { id: true },
+  });
+  const createdIds = created.map((entry) => entry.id);
+  await prisma.auditLog.deleteMany({ where: { actorUserId: { in: createdIds } } });
+  await prisma.user.deleteMany({ where: { id: { in: createdIds } } });
+
+  check(
+    "test data removed",
+    (await prisma.affiliate.count({ where: { email: { contains: ".e2e." } } })) === 0 &&
+      (await prisma.lead.count({ where: { email: { contains: ".e2e." } } })) === 0 &&
+      (await prisma.customer.count({ where: { email: { contains: ".e2e." } } })) === 0,
+  );
 
   console.log(`\n${passed} passed, ${failed} failed`);
   if (failed > 0) process.exitCode = 1;

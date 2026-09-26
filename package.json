@@ -16,7 +16,9 @@
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset --force",
     "test:e2e": "tsx --conditions=react-server scripts/e2e-flow.ts",
-    "test:routes": "tsx --conditions=react-server scripts/route-check.ts"
+    "test:routes": "tsx --conditions=react-server scripts/route-check.ts",
+    "test:actions": "tsx --conditions=react-server scripts/action-check.ts",
+    "test:logout": "tsx --conditions=react-server scripts/logout-check.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

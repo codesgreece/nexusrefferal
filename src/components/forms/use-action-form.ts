@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import type { ActionResult } from "@/lib/errors";
@@ -23,6 +24,8 @@ export function useActionForm<T>(
   options: Options<T> = {},
 ) {
   const { t } = useI18n();
+  const router = useRouter();
+  const pathname = usePathname();
   const [pending, setPending] = React.useState(false);
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
   const [formError, setFormError] = React.useState<string | null>(null);
@@ -46,9 +49,20 @@ export function useActionForm<T>(
           return result;
         }
 
+        const message = t(result.error);
+
+        // An expired or revoked session cannot be recovered from inside a
+        // form, so send the user to sign in again instead of leaving them
+        // stuck on an inline error.
+        if (result.error === "errors.unauthorized") {
+          toast.error(message);
+          router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+          router.refresh();
+          return result;
+        }
+
         setFieldErrors(result.fieldErrors ?? {});
         setDetail(result.detail);
-        const message = t(result.error);
         setFormError(message);
         if (options.toastOnError !== false && !result.fieldErrors) {
           toast.error(message);
@@ -63,7 +77,7 @@ export function useActionForm<T>(
         setPending(false);
       }
     },
-    [action, options, reset, t],
+    [action, options, reset, t, router, pathname],
   );
 
   const onSubmit = React.useCallback(
