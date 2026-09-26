@@ -1,0 +1,533 @@
+// NexusDevStudio Affiliates — relational schema.
+//
+// SQLite is the default datasource so the app runs with zero external services.
+// The schema is intentionally portable: no native enums (string unions validated
+// in the service layer instead) and all money is stored as integer euro cents.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Identity & sessions
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         String // ADMIN | AFFILIATE
+  name         String
+  locale       String    @default("el")
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  affiliate           Affiliate?
+  sessions            Session[]
+  passwordResetTokens PasswordResetToken[]
+  notifications       Notification[]
+  auditLogs           AuditLog[]
+
+  @@index([role])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Affiliates
+// ---------------------------------------------------------------------------
+
+model Affiliate {
+  id     String @id @default(cuid())
+  userId String @unique
+  status String @default("PENDING") // PENDING | ACTIVE | SUSPENDED | REJECTED
+
+  fullName       String
+  email          String   @unique
+  phone          String
+  dateOfBirth    DateTime
+  bio            String?
+  motivation     String?
+  confirmedAdult Boolean  @default(false)
+
+  acceptedTermsAt   DateTime
+  acceptedPrivacyAt DateTime
+
+  appliedAt        DateTime  @default(now())
+  approvedAt       DateTime?
+  approvedById     String?
+  rejectedAt       DateTime?
+  rejectionReason  String?
+  suspendedAt      DateTime?
+  suspensionReason String?
+
+  // Payout details. Never exposed on public surfaces or to other affiliates.
+  payoutMethod       String? // BANK_TRANSFER | PAYPAL | OTHER
+  payoutAccountName  String?
+  payoutIban         String?
+  payoutBankName     String?
+  payoutPaypalEmail  String?
+  payoutOtherDetails String?
+
+  internalNotes String?
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user           User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  socialProfiles AffiliateSocialProfile[]
+  referralCodes  ReferralCode[]
+  referralClicks ReferralClick[]
+  leads          Lead[]
+  customers      Customer[]
+  sales          Sale[]
+  commissions    Commission[]
+  payouts        Payout[]
+
+  @@index([status])
+  @@index([appliedAt])
+}
+
+model AffiliateSocialProfile {
+  id          String   @id @default(cuid())
+  affiliateId String
+  platform    String // TIKTOK | INSTAGRAM | FACEBOOK | YOUTUBE | OTHER
+  handle      String
+  url         String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  affiliate Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@unique([affiliateId, platform])
+}
+
+// ---------------------------------------------------------------------------
+// Referral attribution
+// ---------------------------------------------------------------------------
+
+model ReferralCode {
+  id          String    @id @default(cuid())
+  code        String    @unique // always stored upper-cased / normalized
+  affiliateId String
+  isActive    Boolean   @default(true)
+  isPrimary   Boolean   @default(true)
+  disabledAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  affiliate Affiliate       @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  clicks    ReferralClick[]
+  leads     Lead[]
+  customers Customer[]
+  sales     Sale[]
+
+  @@index([affiliateId])
+  @@index([isActive])
+}
+
+model ReferralClick {
+  id             String   @id @default(cuid())
+  referralCodeId String
+  affiliateId    String
+  code           String
+  landingPath    String?
+  source         String?
+  campaign       String?
+  medium         String?
+  referer        String?
+  userAgent      String?
+  deviceType     String? // MOBILE | TABLET | DESKTOP | UNKNOWN
+  ipHash         String? // hashed, never the raw address
+  visitorId      String?
+  createdAt      DateTime @default(now())
+
+  referralCode ReferralCode @relation(fields: [referralCodeId], references: [id], onDelete: Cascade)
+  affiliate    Affiliate    @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@index([affiliateId, createdAt])
+  @@index([code])
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Catalogue
+// ---------------------------------------------------------------------------
+
+model Service {
+  id            String @id @default(cuid())
+  slug          String @unique
+  name          String
+  nameEn        String
+  nameEl        String
+  descriptionEn String
+  descriptionEl String
+  featuresEn    String @default("[]") // JSON array of strings
+  featuresEl    String @default("[]")
+
+  startingPriceCents Int
+  priceFrom          Boolean @default(false) // renders "€500+"
+
+  commissionType       String @default("FIXED") // FIXED | PERCENT
+  commissionFixedCents Int?
+  commissionPercent    Float?
+
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leads       Lead[]
+  customers   Customer[]
+  sales       Sale[]
+  commissions Commission[]
+
+  @@index([isActive, sortOrder])
+}
+
+// ---------------------------------------------------------------------------
+// Pipeline
+// ---------------------------------------------------------------------------
+
+model Lead {
+  id           String  @id @default(cuid())
+  reference    String  @unique
+  customerName String
+  businessName String?
+  email        String
+  phone        String?
+  message      String?
+  serviceId    String?
+
+  status String @default("NEW") // NEW | CONTACTED | QUALIFIED | PROPOSAL | WON | LOST | CANCELLED
+
+  affiliateId       String?
+  referralCodeId    String?
+  referralCodeRaw   String?
+  attributionMethod String? // REFERRAL_LINK | REFERRAL_CODE | MANUAL | TIKTOK | INSTAGRAM | FACEBOOK | DM | COMMENT | WHATSAPP | PHONE | OTHER
+  attributedAt      DateTime?
+  attributionSource String?
+  attributionNotes  String?
+
+  customerId           String?
+  estimatedAmountCents Int?
+  internalNotes        String?
+  createdByUserId      String?
+  origin               String  @default("PUBLIC_FORM") // PUBLIC_FORM | ADMIN
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  service      Service?      @relation(fields: [serviceId], references: [id])
+  affiliate    Affiliate?    @relation(fields: [affiliateId], references: [id])
+  referralCode ReferralCode? @relation(fields: [referralCodeId], references: [id])
+  customer     Customer?     @relation(fields: [customerId], references: [id])
+  sales        Sale[]
+
+  @@index([affiliateId, createdAt])
+  @@index([status])
+  @@index([createdAt])
+  @@index([email])
+}
+
+model Customer {
+  id           String  @id @default(cuid())
+  fullName     String
+  businessName String?
+  email        String  @unique
+  phone        String? @unique
+  serviceId    String?
+
+  affiliateId    String?
+  referralCodeId String?
+  referralCode   String?
+  source         String?
+  status         String  @default("ACTIVE") // ACTIVE | INACTIVE | BLOCKED
+
+  internalNotes   String?
+  createdByUserId String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  service         Service?      @relation(fields: [serviceId], references: [id])
+  affiliate       Affiliate?    @relation(fields: [affiliateId], references: [id])
+  referralCodeRel ReferralCode? @relation(fields: [referralCodeId], references: [id])
+  leads           Lead[]
+  sales           Sale[]
+  commissions     Commission[]
+
+  @@index([affiliateId])
+  @@index([createdAt])
+}
+
+model Sale {
+  id         String  @id @default(cuid())
+  reference  String  @unique
+  customerId String
+  leadId     String?
+  serviceId  String
+
+  affiliateId       String?
+  referralCodeId    String?
+  referralCode      String?
+  attributionMethod String?
+
+  amountCents    Int
+  domainIncluded Boolean @default(false)
+  domainFeeCents Int     @default(0)
+
+  saleDate           DateTime
+  paymentStatus      String    @default("PENDING") // PENDING | PAID | REFUNDED | CANCELLED
+  orderStatus        String    @default("OPEN") // OPEN | IN_PROGRESS | DELIVERED | CANCELLED
+  paymentConfirmedAt DateTime?
+  paymentReference   String?
+
+  internalNotes   String?
+  createdByUserId String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  customer        Customer      @relation(fields: [customerId], references: [id])
+  lead            Lead?         @relation(fields: [leadId], references: [id])
+  service         Service       @relation(fields: [serviceId], references: [id])
+  affiliate       Affiliate?    @relation(fields: [affiliateId], references: [id])
+  referralCodeRel ReferralCode? @relation(fields: [referralCodeId], references: [id])
+  commission      Commission?
+
+  @@index([affiliateId, saleDate])
+  @@index([paymentStatus])
+  @@index([saleDate])
+}
+
+// ---------------------------------------------------------------------------
+// Money out
+// ---------------------------------------------------------------------------
+
+model Commission {
+  // One commission per sale, enforced by the database. This is the idempotency
+  // key for commission generation on payment confirmation.
+  saleId String @unique
+
+  id          String @id @default(cuid())
+  affiliateId String
+  customerId  String
+  serviceId   String
+
+  saleAmountCents       Int
+  commissionAmountCents Int
+  commissionType        String // FIXED | PERCENT
+  commissionRate        Float?
+
+  referralCode      String?
+  attributionMethod String?
+
+  status String @default("PENDING") // PENDING | APPROVED | PAID | REJECTED | CANCELLED
+
+  approvedAt         DateTime?
+  approvedById       String?
+  rejectedAt         DateTime?
+  rejectionReason    String?
+  cancelledAt        DateTime?
+  cancellationReason String?
+  paidAt             DateTime?
+  payoutId           String?
+
+  internalNotes String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sale      Sale      @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  affiliate Affiliate @relation(fields: [affiliateId], references: [id])
+  customer  Customer  @relation(fields: [customerId], references: [id])
+  service   Service   @relation(fields: [serviceId], references: [id])
+  payout    Payout?   @relation(fields: [payoutId], references: [id])
+
+  @@index([affiliateId, status])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Payout {
+  id          String @id @default(cuid())
+  reference   String @unique
+  affiliateId String
+  amountCents Int
+  status      String @default("REQUESTED") // REQUESTED | APPROVED | PAID | REJECTED
+
+  method                String?
+  methodDetailsSnapshot String?
+
+  requestedAt          DateTime  @default(now())
+  approvedAt           DateTime?
+  approvedById         String?
+  paidAt               DateTime?
+  paidById             String?
+  rejectedAt           DateTime?
+  rejectionReason      String?
+  transactionReference String?
+  notes                String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  affiliate     Affiliate             @relation(fields: [affiliateId], references: [id])
+  commissions   Commission[]
+  statusHistory PayoutStatusHistory[]
+
+  @@index([affiliateId, status])
+  @@index([status])
+}
+
+// Append-only: rows are never updated or deleted.
+model PayoutStatusHistory {
+  id         String   @id @default(cuid())
+  payoutId   String
+  fromStatus String?
+  toStatus   String
+  note       String?
+  actorId    String?
+  actorEmail String?
+  createdAt  DateTime @default(now())
+
+  payout Payout @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+
+  @@index([payoutId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Supporting systems
+// ---------------------------------------------------------------------------
+
+model Notification {
+  id         String    @id @default(cuid())
+  userId     String
+  // Translated at render time from `type` + `paramsJson` so notifications
+  // follow the reader's language instead of the language at creation time.
+  type       String
+  paramsJson String    @default("{}")
+  link       String?
+  severity   String    @default("INFO") // INFO | SUCCESS | WARNING | ERROR
+  readAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+}
+
+model AffiliateResource {
+  id            String  @id @default(cuid())
+  titleEn       String
+  titleEl       String
+  descriptionEn String
+  descriptionEl String
+  type          String // SCRIPT | CAPTION | IDEA | IMAGE | VIDEO | LOGO | BRAND_ASSET | OFFER | GUIDELINE
+  contentEn     String?
+  contentEl     String?
+  url           String?
+  thumbnailUrl  String?
+  isActive      Boolean @default(true)
+  sortOrder     Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model ProgramSettings {
+  id            String  @id @default("singleton")
+  programName   String  @default("NexusDevStudio Affiliates")
+  programActive Boolean @default(true)
+  currency      String  @default("EUR")
+
+  minPayoutCents     Int @default(5000)
+  referralCookieDays Int @default(30)
+  domainFeeCents     Int @default(1500)
+
+  defaultCommissionType       String @default("FIXED")
+  defaultCommissionFixedCents Int    @default(2000)
+  defaultCommissionPercent    Float  @default(10)
+
+  termsUrl     String @default("/terms")
+  privacyUrl   String @default("/privacy")
+  contactEmail String @default("hello@nexusdevstudio.com")
+
+  paymentInstructionsEn String @default("")
+  paymentInstructionsEl String @default("")
+  termsContentEn        String @default("")
+  termsContentEl        String @default("")
+  privacyContentEn      String @default("")
+  privacyContentEl      String @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id            String   @id @default(cuid())
+  actorUserId   String?
+  actorEmail    String?
+  actorRole     String?
+  action        String
+  entityType    String
+  entityId      String?
+  previousValue String?
+  newValue      String?
+  metadata      String?
+  ip            String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+
+  actor User? @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([action])
+  @@index([entityType, entityId])
+  @@index([actorUserId])
+}
+
+// Persistent counter used to mint human-readable references (LD-000001, …).
+model Counter {
+  name  String @id
+  value Int    @default(0)
+}
