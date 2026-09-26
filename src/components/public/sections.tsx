@@ -42,7 +42,7 @@ export function SectionHeading({
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">{title}</h2>
+      <h2 className="text-[1.65rem] font-semibold tracking-tight text-ink sm:text-4xl">{title}</h2>
       {subtitle ? (
         <p className="text-base leading-relaxed text-muted">{subtitle}</p>
       ) : null}
@@ -77,18 +77,18 @@ export function Benefits() {
   ];
 
   return (
-    <section className="relative border-t border-white/6 py-20 sm:py-24">
+    <section className="relative overflow-x-hidden border-t border-white/6 py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow={t("brand.program")}
           title={t("landing.benefitsTitle")}
           subtitle={t("landing.benefitsSubtitle")}
         />
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-4 sm:mt-12 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((item) => (
             <div
               key={item.title}
-              className="group relative overflow-hidden rounded-2xl border border-white/8 bg-surface/70 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-violet-500/35 hover:shadow-glow-sm"
+              className="group relative overflow-hidden rounded-2xl border border-white/8 bg-surface/70 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-violet-500/35 hover:shadow-glow-sm sm:p-6"
             >
               <div
                 aria-hidden
@@ -119,10 +119,13 @@ export function HowItWorks() {
   }));
 
   return (
-    <section id="how" className="relative scroll-mt-20 border-t border-white/6 py-20 sm:py-24">
+    <section
+      id="how"
+      className="relative scroll-mt-20 overflow-x-hidden border-t border-white/6 py-16 sm:py-24"
+    >
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 size-[30rem] -translate-x-1/2 rounded-full bg-violet-700/10 blur-[120px]"
+        className="pointer-events-none absolute left-1/2 top-0 size-[18rem] -translate-x-1/2 rounded-full bg-violet-700/10 blur-[80px] sm:size-[30rem] sm:blur-[120px]"
       />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
@@ -130,11 +133,11 @@ export function HowItWorks() {
           title={t("landing.howTitle")}
           subtitle={t("landing.howSubtitle")}
         />
-        <ol className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <ol className="mt-10 grid gap-4 sm:mt-12 md:grid-cols-2 lg:grid-cols-3">
           {steps.map((step) => (
             <li
               key={step.number}
-              className="relative overflow-hidden rounded-2xl border border-white/8 bg-surface/70 p-6 transition-colors hover:border-violet-500/30"
+              className="relative overflow-hidden rounded-2xl border border-white/8 bg-surface/70 p-5 transition-colors hover:border-violet-500/30 sm:p-6"
             >
               <span className="pointer-events-none absolute right-4 top-2 font-mono text-5xl font-bold text-white/[0.045]">
                 {step.number}
@@ -179,9 +182,9 @@ export function CommissionExplainer() {
   ];
 
   return (
-    <section className="relative border-t border-white/6 py-20 sm:py-24">
+    <section className="relative overflow-x-hidden border-t border-white/6 py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start lg:gap-12">
           <SectionHeading
             eyebrow={t("admin.commissions.commission")}
             title={t("landing.commissionTitle")}
@@ -192,7 +195,7 @@ export function CommissionExplainer() {
             {points.map((point) => (
               <div
                 key={point.title}
-                className="rounded-2xl border border-white/8 bg-surface/70 p-5"
+                className="rounded-2xl border border-white/8 bg-surface/70 p-4 sm:p-5"
               >
                 <span className="grid size-10 place-items-center rounded-xl border border-violet-500/25 bg-violet-500/10 text-violet-300">
                   {point.icon}
@@ -225,7 +228,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+        className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left sm:gap-4 sm:px-5"
       >
         <span className="text-sm font-medium text-ink sm:text-base">{question}</span>
         <ChevronDown
@@ -254,14 +257,17 @@ export function Faq() {
   const keys = [1, 2, 3, 4, 5, 6, 7, 8];
 
   return (
-    <section id="faq" className="relative scroll-mt-20 border-t border-white/6 py-20 sm:py-24">
+    <section
+      id="faq"
+      className="relative scroll-mt-20 overflow-x-hidden border-t border-white/6 py-16 sm:py-24"
+    >
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow={t("nav.faq")}
           title={t("landing.faqTitle")}
           subtitle={t("landing.faqSubtitle")}
         />
-        <div className="mt-10 space-y-3">
+        <div className="mt-8 space-y-3 sm:mt-10">
           {keys.map((index) => (
             <FaqItem
               key={index}
@@ -285,9 +291,9 @@ export function FinalCta({
   const { t } = useI18n();
 
   return (
-    <section className="relative border-t border-white/6 py-20 sm:py-28">
+    <section className="relative overflow-x-hidden border-t border-white/6 py-16 sm:py-28">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl border border-violet-500/25 bg-linear-to-br from-violet-800/25 via-surface to-surface p-8 text-center shadow-glow sm:p-14">
+        <div className="relative overflow-hidden rounded-3xl border border-violet-500/25 bg-linear-to-br from-violet-800/25 via-surface to-surface p-6 text-center shadow-glow sm:p-14">
           <div
             aria-hidden
             className="pointer-events-none absolute -left-20 -top-20 size-72 rounded-full bg-violet-600/25 blur-[90px]"
@@ -297,15 +303,15 @@ export function FinalCta({
             className="pointer-events-none absolute -bottom-24 -right-16 size-72 rounded-full bg-violet-500/18 blur-[90px]"
           />
           <div className="relative">
-            <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+            <h2 className="text-[1.65rem] font-semibold tracking-tight text-ink sm:text-4xl">
               {t("landing.ctaTitle")}
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted">
+            <p className="mx-auto mt-4 max-w-xl text-[0.95rem] leading-relaxed text-muted sm:text-base">
               {t("landing.ctaBody")}
             </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
               {programActive ? (
-                <Button asChild size="lg">
+                <Button asChild size="lg" block className="sm:w-auto sm:flex-none">
                   <Link href="/affiliate/register">
                     {t("landing.ctaPrimary")}
                     <ArrowRight />
@@ -316,7 +322,7 @@ export function FinalCta({
                   {t("landing.programPaused")}
                 </p>
               )}
-              <Button asChild variant="secondary" size="lg">
+              <Button asChild variant="secondary" size="lg" block className="sm:w-auto sm:flex-none">
                 <Link href={termsUrl}>{t("landing.ctaSecondary")}</Link>
               </Button>
             </div>

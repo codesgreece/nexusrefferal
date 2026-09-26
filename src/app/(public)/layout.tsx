@@ -11,7 +11,7 @@ export default async function PublicLayout({
   const [user, settings] = await Promise.all([getCurrentUser(), getSettings()]);
 
   return (
-    <div className="flex min-h-dvh flex-col bg-void">
+    <div className="flex min-h-dvh w-full flex-col overflow-x-hidden bg-void">
       <SiteHeader
         isAuthenticated={Boolean(user)}
         dashboardHref={user?.role === "ADMIN" ? "/admin" : "/affiliate/dashboard"}

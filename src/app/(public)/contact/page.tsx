@@ -28,14 +28,14 @@ export default async function ContactPage({
     : "";
 
   return (
-    <div className="relative">
+    <div className="relative overflow-x-hidden">
       <div aria-hidden className="pointer-events-none absolute inset-0 grid-noise opacity-40" />
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-40 top-0 size-[28rem] rounded-full bg-violet-700/16 blur-[120px]"
+        className="pointer-events-none absolute -left-20 top-0 size-[16rem] rounded-full bg-violet-700/16 blur-[80px] sm:-left-40 sm:size-[28rem] sm:blur-[120px]"
       />
-      <div className="relative mx-auto max-w-2xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-        <Card glow>
+      <div className="relative mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-20 lg:px-8">
+        <Card glow className="min-w-0 overflow-hidden">
           <CardHeader title={t("contact.title")} description={t("contact.subtitle")} />
           <CardBody>
             <ContactForm

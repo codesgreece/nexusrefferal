@@ -46,7 +46,7 @@ export function PerformanceCharts({
     <div
       role="tablist"
       aria-label={t("affiliate.analytics.title")}
-      className="flex gap-1 rounded-xl border border-white/8 bg-white/[0.03] p-1"
+      className="flex max-w-full gap-1 overflow-x-auto rounded-xl border border-white/8 bg-white/[0.03] p-1"
     >
       {ranges.map((entry) => (
         <button
@@ -56,7 +56,7 @@ export function PerformanceCharts({
           aria-selected={range === entry.key}
           onClick={() => setRange(entry.key)}
           className={cn(
-            "rounded-lg px-2.5 py-1.5 text-xs transition-colors",
+            "shrink-0 rounded-lg px-2.5 py-1.5 text-xs transition-colors",
             range === entry.key
               ? "bg-violet-500/18 font-medium text-violet-100"
               : "text-muted hover:text-ink",

@@ -38,11 +38,11 @@ export default function SetupPage() {
   ];
 
   return (
-    <div className="relative flex min-h-dvh items-center justify-center bg-void px-4 py-16">
+    <div className="relative flex min-h-dvh w-full items-center justify-center overflow-x-hidden bg-void px-4 py-16">
       <div aria-hidden className="pointer-events-none absolute inset-0 grid-noise opacity-50" />
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 -top-32 size-[30rem] rounded-full bg-violet-700/18 blur-[120px]"
+        className="pointer-events-none absolute -left-20 -top-20 size-[18rem] rounded-full bg-violet-700/18 blur-[80px] sm:-left-32 sm:-top-32 sm:size-[30rem] sm:blur-[120px]"
       />
 
       <main className="relative w-full max-w-2xl">

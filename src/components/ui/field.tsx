@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/provider";
 
 const controlBase =
-  "w-full rounded-xl border border-white/10 bg-surface-2/80 px-3.5 text-sm text-ink transition-colors placeholder:text-muted-2 hover:border-white/16 focus:border-violet-500/70 focus:bg-surface-2 focus:outline-none focus:ring-4 focus:ring-violet-500/12 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-danger/60 aria-[invalid=true]:ring-danger/12";
+  "w-full max-w-full rounded-xl border border-white/10 bg-surface-2/80 px-3.5 text-base text-ink transition-colors placeholder:text-muted-2 hover:border-white/16 focus:border-violet-500/70 focus:bg-surface-2 focus:outline-none focus:ring-4 focus:ring-violet-500/12 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-danger/60 aria-[invalid=true]:ring-danger/12 sm:text-sm";
 
 export function Label({
   className,

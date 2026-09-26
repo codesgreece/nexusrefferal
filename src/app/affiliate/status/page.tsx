@@ -70,23 +70,23 @@ export default async function AffiliateStatusPage() {
   };
 
   return (
-    <div className="relative flex min-h-dvh flex-col bg-void">
+    <div className="relative flex min-h-dvh w-full flex-col overflow-x-hidden bg-void">
       <div aria-hidden className="pointer-events-none absolute inset-0 grid-noise opacity-50" />
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 -top-32 size-[30rem] rounded-full bg-violet-700/18 blur-[120px]"
+        className="pointer-events-none absolute -left-20 -top-20 size-[18rem] rounded-full bg-violet-700/18 blur-[80px] sm:-left-32 sm:-top-32 sm:size-[30rem] sm:blur-[120px]"
       />
 
-      <header className="relative z-10 flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Logo href="/" />
-        <div className="flex items-center gap-2">
-          <LanguageSwitcher />
+      <header className="relative z-10 flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+        <Logo href="/" className="min-w-0" />
+        <div className="flex shrink-0 items-center gap-2">
+          <LanguageSwitcher compact />
           <LogoutButton variant="menu" className="w-auto" />
         </div>
       </header>
 
       <main className="relative z-10 flex flex-1 items-center justify-center px-4 pb-16 sm:px-6">
-        <Card glow className="w-full max-w-lg">
+        <Card glow className="w-full max-w-lg min-w-0 overflow-hidden">
           <CardHeader
             icon={<span className={`grid place-items-center ${view.tone}`}>{view.icon}</span>}
             title={view.title}

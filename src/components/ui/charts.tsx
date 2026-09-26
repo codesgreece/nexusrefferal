@@ -196,15 +196,15 @@ export function ChartFrame({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-white/8 bg-surface/80 p-5 shadow-card",
+        "min-w-0 overflow-hidden rounded-2xl border border-white/8 bg-surface/80 p-4 shadow-card sm:p-5",
         className,
       )}
     >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-ink">{title}</h3>
+        <h3 className="min-w-0 text-sm font-semibold text-ink">{title}</h3>
         {action}
       </div>
-      {children}
+      <div className="min-w-0 overflow-x-auto">{children}</div>
     </div>
   );
 }
