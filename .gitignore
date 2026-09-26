@@ -50,3 +50,7 @@ prisma/*.db-journal
 
 # Vercel CLI writes this when linking a project
 .vercel
+
+# Agent skills installed by the Vercel CLI
+.agents/
+skills-lock.json
