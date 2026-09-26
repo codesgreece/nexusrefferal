@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { SESSION_COOKIE } from "@/lib/auth/session";
+import { isDatabaseConfigured } from "@/lib/config-state";
 
 /**
  * Edge-level hardening and an optimistic auth redirect.
@@ -14,6 +15,12 @@ const PROTECTED_PREFIXES = ["/admin", "/affiliate/dashboard", "/affiliate/leads"
 
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+
+  // Without a database every page would fail on its first query, so serve the
+  // setup screen instead of an error boundary.
+  if (!isDatabaseConfigured() && pathname !== "/setup") {
+    return NextResponse.rewrite(new URL("/setup", request.url));
+  }
 
   const needsSession = PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),

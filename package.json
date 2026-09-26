@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 43711 --hostname 0.0.0.0",
-    "build": "prisma generate && prisma migrate deploy && prisma db seed && next build",
-    "build:app": "prisma generate && next build",
+    "build": "node scripts/db.mjs generate && node scripts/db.mjs deploy && next build",
+    "build:app": "node scripts/db.mjs generate && next build",
     "start": "next start --port ${PORT:-43711}",
-    "postinstall": "prisma generate",
+    "postinstall": "node scripts/db.mjs generate",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "db:migrate": "prisma migrate dev",
