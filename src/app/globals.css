@@ -115,9 +115,12 @@
     color-scheme: dark;
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    width: 100%;
+    max-width: 100%;
     /* Decorative blurs / absolute orbs must not create sideways rubber-banding. */
     overflow-x: hidden;
-    overflow-x: clip;
     overscroll-behavior-x: none;
   }
 
@@ -127,9 +130,16 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    width: 100%;
+    max-width: 100%;
     overflow-x: hidden;
-    overflow-x: clip;
     overscroll-behavior-x: none;
+    position: relative;
+    overflow-wrap: anywhere;
+  }
+
+  /* Keep every top-level shell inside the device width. */
+  body > * {
     max-width: 100%;
   }
 
@@ -138,6 +148,7 @@
   canvas,
   svg {
     max-width: 100%;
+    height: auto;
   }
 
   /*
@@ -148,7 +159,13 @@
     input,
     textarea,
     select {
-      font-size: 16px;
+      font-size: 16px !important;
+    }
+
+    /* Large floating blurs make the page feel like it is shaking on phones. */
+    .animate-float,
+    .animate-pulse-glow {
+      animation: none !important;
     }
   }
 

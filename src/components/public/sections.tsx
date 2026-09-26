@@ -77,7 +77,7 @@ export function Benefits() {
   ];
 
   return (
-    <section className="relative overflow-x-clip border-t border-white/6 py-16 sm:py-24">
+    <section className="relative overflow-x-hidden border-t border-white/6 py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow={t("brand.program")}
@@ -121,11 +121,11 @@ export function HowItWorks() {
   return (
     <section
       id="how"
-      className="relative scroll-mt-20 overflow-x-clip border-t border-white/6 py-16 sm:py-24"
+      className="relative scroll-mt-20 overflow-x-hidden border-t border-white/6 py-16 sm:py-24"
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 size-[30rem] -translate-x-1/2 rounded-full bg-violet-700/10 blur-[120px]"
+        className="pointer-events-none absolute left-1/2 top-0 size-[18rem] -translate-x-1/2 rounded-full bg-violet-700/10 blur-[80px] sm:size-[30rem] sm:blur-[120px]"
       />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
@@ -182,7 +182,7 @@ export function CommissionExplainer() {
   ];
 
   return (
-    <section className="relative overflow-x-clip border-t border-white/6 py-16 sm:py-24">
+    <section className="relative overflow-x-hidden border-t border-white/6 py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start lg:gap-12">
           <SectionHeading
@@ -259,7 +259,7 @@ export function Faq() {
   return (
     <section
       id="faq"
-      className="relative scroll-mt-20 overflow-x-clip border-t border-white/6 py-16 sm:py-24"
+      className="relative scroll-mt-20 overflow-x-hidden border-t border-white/6 py-16 sm:py-24"
     >
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
@@ -291,7 +291,7 @@ export function FinalCta({
   const { t } = useI18n();
 
   return (
-    <section className="relative overflow-x-clip border-t border-white/6 py-16 sm:py-28">
+    <section className="relative overflow-x-hidden border-t border-white/6 py-16 sm:py-28">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl border border-violet-500/25 bg-linear-to-br from-violet-800/25 via-surface to-surface p-6 text-center shadow-glow sm:p-14">
           <div

@@ -185,10 +185,10 @@ export function AppShell({
   );
 
   return (
-    <div className="min-h-dvh max-w-[100vw] overflow-x-clip bg-void">
+    <div className="min-h-dvh w-full overflow-x-hidden bg-void">
       <div
         aria-hidden
-        className="pointer-events-none fixed -left-40 -top-40 size-[30rem] rounded-full bg-violet-800/12 blur-[130px]"
+        className="pointer-events-none fixed -left-20 -top-20 size-[16rem] rounded-full bg-violet-800/12 blur-[80px] sm:-left-40 sm:-top-40 sm:size-[30rem] sm:blur-[130px]"
       />
 
       {/* Desktop sidebar */}

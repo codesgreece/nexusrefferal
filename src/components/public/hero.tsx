@@ -123,15 +123,15 @@ export function Hero({
   const { t } = useI18n();
 
   return (
-    <section className="relative overflow-x-clip">
+    <section className="relative overflow-x-hidden">
       <div aria-hidden className="pointer-events-none absolute inset-0 grid-noise opacity-60" />
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-40 -top-40 size-[34rem] rounded-full bg-violet-700/22 blur-[120px] motion-safe:animate-float"
+        className="pointer-events-none absolute -left-24 -top-24 size-[22rem] rounded-full bg-violet-700/22 blur-[90px] motion-safe:animate-float sm:-left-40 sm:-top-40 sm:size-[34rem] sm:blur-[120px]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-32 top-20 size-[28rem] rounded-full bg-violet-500/14 blur-[110px]"
+        className="pointer-events-none absolute -right-20 top-16 size-[18rem] rounded-full bg-violet-500/14 blur-[80px] sm:-right-32 sm:top-20 sm:size-[28rem] sm:blur-[110px]"
       />
       <div
         aria-hidden

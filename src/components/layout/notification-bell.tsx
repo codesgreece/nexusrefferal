@@ -64,7 +64,7 @@ export function NotificationBell({
           align="end"
           sideOffset={8}
           collisionPadding={12}
-          className="z-50 w-[min(24rem,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border border-white/10 bg-surface-2/97 shadow-glow backdrop-blur data-[state=open]:animate-fade-in"
+          className="z-50 w-[min(24rem,calc(100%-1.5rem))] max-w-[calc(100%-1.5rem)] overflow-hidden rounded-2xl border border-white/10 bg-surface-2/97 shadow-glow backdrop-blur data-[state=open]:animate-fade-in"
         >
           <div className="flex items-center justify-between gap-2 border-b border-white/8 px-4 py-3">
             <div>

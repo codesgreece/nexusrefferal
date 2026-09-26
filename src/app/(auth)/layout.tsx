@@ -6,15 +6,15 @@ import { LanguageSwitcher } from "@/components/layout/language-switcher";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative flex min-h-dvh max-w-[100vw] flex-col overflow-x-clip bg-void">
+    <div className="relative flex min-h-dvh w-full flex-col overflow-x-hidden bg-void">
       <div aria-hidden className="pointer-events-none absolute inset-0 grid-noise opacity-50" />
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 -top-32 size-[30rem] rounded-full bg-violet-700/20 blur-[120px]"
+        className="pointer-events-none absolute -left-20 -top-20 size-[18rem] rounded-full bg-violet-700/20 blur-[80px] sm:-left-32 sm:-top-32 sm:size-[30rem] sm:blur-[120px]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-40 -right-24 size-[28rem] rounded-full bg-violet-600/14 blur-[110px]"
+        className="pointer-events-none absolute -bottom-24 -right-16 size-[16rem] rounded-full bg-violet-600/14 blur-[70px] sm:-bottom-40 sm:-right-24 sm:size-[28rem] sm:blur-[110px]"
       />
 
       <header className="relative z-10 flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
