@@ -13,9 +13,29 @@
  * pooler need to configure only one variable.
  */
 import { spawnSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 
 const PLACEHOLDER = "postgresql://placeholder:placeholder@127.0.0.1:5432/placeholder";
 const command = process.argv[2];
+
+/**
+ * Loads .env files the way the Prisma CLI and Next.js do, so a local build
+ * behaves the same as a hosted one where the variables are already exported.
+ */
+function loadDotEnv() {
+  for (const file of [".env.local", ".env"]) {
+    if (!existsSync(file)) continue;
+    for (const line of readFileSync(file, "utf8").split("\n")) {
+      const match = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/.exec(line);
+      if (!match) continue;
+      const [, key, rawValue] = match;
+      if (process.env[key] !== undefined) continue;
+      process.env[key] = rawValue.replace(/^["']|["']$/g, "");
+    }
+  }
+}
+
+loadDotEnv();
 
 const hasDatabase = Boolean(process.env.DATABASE_URL?.startsWith("postgres"));
 const env = { ...process.env };

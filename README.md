@@ -52,13 +52,20 @@ Sign in at `/login` with the `ADMIN_EMAIL` and `ADMIN_PASSWORD` from your `.env`
 ## Deploying to Vercel
 
 1. Import the repository into Vercel. The framework is detected as Next.js.
-2. Add a PostgreSQL database (Vercel Postgres, Neon or Supabase all work) and
-   set `DATABASE_URL` and `DIRECT_URL` from it.
-3. Add `SESSION_SECRET`, `NEXT_PUBLIC_APP_URL`, `ADMIN_EMAIL` and
-   `ADMIN_PASSWORD` as environment variables.
-4. Deploy. The build command runs `prisma migrate deploy` and the idempotent
-   seed before `next build`, so the schema, service catalogue and administrator
-   account are in place on first boot.
+2. Set `SESSION_SECRET`, `NEXT_PUBLIC_APP_URL`, `ADMIN_EMAIL` and
+   `ADMIN_PASSWORD` in the project's environment variables.
+3. Open the project's **Storage** tab and create a PostgreSQL database. Neon and
+   Prisma Postgres both work, and Vercel writes `DATABASE_URL` into the project
+   for you. `DIRECT_URL` is optional — when it is absent it falls back to
+   `DATABASE_URL`.
+4. Redeploy. `npm run build` applies the migrations, runs the idempotent seed
+   and then builds, so the schema, service catalogue, program settings and
+   administrator account are in place on first boot.
+
+A deployment without a database still builds and serves: every request is
+rewritten to a `/setup` screen that names the missing environment variables
+instead of failing the build or showing an error boundary. The screen goes away
+on the next deployment once `DATABASE_URL` is present.
 
 ## Architecture
 
