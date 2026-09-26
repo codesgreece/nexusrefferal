@@ -1,60 +1,64 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
     "role" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "locale" TEXT NOT NULL DEFAULT 'el',
     "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "lastLoginAt" DATETIME,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "lastLoginAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Session" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "tokenHash" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "expiresAt" DATETIME NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
     "ip" TEXT,
     "userAgent" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "PasswordResetToken" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "tokenHash" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "expiresAt" DATETIME NOT NULL,
-    "usedAt" DATETIME,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "PasswordResetToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "usedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "PasswordResetToken_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Affiliate" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'PENDING',
     "fullName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
-    "dateOfBirth" DATETIME NOT NULL,
+    "dateOfBirth" TIMESTAMP(3) NOT NULL,
     "bio" TEXT,
     "motivation" TEXT,
     "confirmedAdult" BOOLEAN NOT NULL DEFAULT false,
-    "acceptedTermsAt" DATETIME NOT NULL,
-    "acceptedPrivacyAt" DATETIME NOT NULL,
-    "appliedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "approvedAt" DATETIME,
+    "acceptedTermsAt" TIMESTAMP(3) NOT NULL,
+    "acceptedPrivacyAt" TIMESTAMP(3) NOT NULL,
+    "appliedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "approvedAt" TIMESTAMP(3),
     "approvedById" TEXT,
-    "rejectedAt" DATETIME,
+    "rejectedAt" TIMESTAMP(3),
     "rejectionReason" TEXT,
-    "suspendedAt" DATETIME,
+    "suspendedAt" TIMESTAMP(3),
     "suspensionReason" TEXT,
     "payoutMethod" TEXT,
     "payoutAccountName" TEXT,
@@ -63,40 +67,43 @@ CREATE TABLE "Affiliate" (
     "payoutPaypalEmail" TEXT,
     "payoutOtherDetails" TEXT,
     "internalNotes" TEXT,
-    "deletedAt" DATETIME,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "Affiliate_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "deletedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Affiliate_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "AffiliateSocialProfile" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "affiliateId" TEXT NOT NULL,
     "platform" TEXT NOT NULL,
     "handle" TEXT NOT NULL,
     "url" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "AffiliateSocialProfile_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "AffiliateSocialProfile_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ReferralCode" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "code" TEXT NOT NULL,
     "affiliateId" TEXT NOT NULL,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "isPrimary" BOOLEAN NOT NULL DEFAULT true,
-    "disabledAt" DATETIME,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "ReferralCode_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "disabledAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ReferralCode_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ReferralClick" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "referralCodeId" TEXT NOT NULL,
     "affiliateId" TEXT NOT NULL,
     "code" TEXT NOT NULL,
@@ -109,14 +116,14 @@ CREATE TABLE "ReferralClick" (
     "deviceType" TEXT,
     "ipHash" TEXT,
     "visitorId" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "ReferralClick_referralCodeId_fkey" FOREIGN KEY ("referralCodeId") REFERENCES "ReferralCode" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "ReferralClick_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "ReferralClick_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Service" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "nameEn" TEXT NOT NULL,
@@ -129,16 +136,18 @@ CREATE TABLE "Service" (
     "priceFrom" BOOLEAN NOT NULL DEFAULT false,
     "commissionType" TEXT NOT NULL DEFAULT 'FIXED',
     "commissionFixedCents" INTEGER,
-    "commissionPercent" REAL,
+    "commissionPercent" DOUBLE PRECISION,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Service_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Lead" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "reference" TEXT NOT NULL,
     "customerName" TEXT NOT NULL,
     "businessName" TEXT,
@@ -151,7 +160,7 @@ CREATE TABLE "Lead" (
     "referralCodeId" TEXT,
     "referralCodeRaw" TEXT,
     "attributionMethod" TEXT,
-    "attributedAt" DATETIME,
+    "attributedAt" TIMESTAMP(3),
     "attributionSource" TEXT,
     "attributionNotes" TEXT,
     "customerId" TEXT,
@@ -159,18 +168,16 @@ CREATE TABLE "Lead" (
     "internalNotes" TEXT,
     "createdByUserId" TEXT,
     "origin" TEXT NOT NULL DEFAULT 'PUBLIC_FORM',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    "deletedAt" DATETIME,
-    CONSTRAINT "Lead_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Lead_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Lead_referralCodeId_fkey" FOREIGN KEY ("referralCodeId") REFERENCES "ReferralCode" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Lead_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
+
+    CONSTRAINT "Lead_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Customer" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "fullName" TEXT NOT NULL,
     "businessName" TEXT,
     "email" TEXT NOT NULL,
@@ -183,17 +190,16 @@ CREATE TABLE "Customer" (
     "status" TEXT NOT NULL DEFAULT 'ACTIVE',
     "internalNotes" TEXT,
     "createdByUserId" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    "deletedAt" DATETIME,
-    CONSTRAINT "Customer_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Customer_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Customer_referralCodeId_fkey" FOREIGN KEY ("referralCodeId") REFERENCES "ReferralCode" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
+
+    CONSTRAINT "Customer_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Sale" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "reference" TEXT NOT NULL,
     "customerId" TEXT NOT NULL,
     "leadId" TEXT,
@@ -205,107 +211,104 @@ CREATE TABLE "Sale" (
     "amountCents" INTEGER NOT NULL,
     "domainIncluded" BOOLEAN NOT NULL DEFAULT false,
     "domainFeeCents" INTEGER NOT NULL DEFAULT 0,
-    "saleDate" DATETIME NOT NULL,
+    "saleDate" TIMESTAMP(3) NOT NULL,
     "paymentStatus" TEXT NOT NULL DEFAULT 'PENDING',
     "orderStatus" TEXT NOT NULL DEFAULT 'OPEN',
-    "paymentConfirmedAt" DATETIME,
+    "paymentConfirmedAt" TIMESTAMP(3),
     "paymentReference" TEXT,
     "internalNotes" TEXT,
     "createdByUserId" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    "deletedAt" DATETIME,
-    CONSTRAINT "Sale_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "Sale_leadId_fkey" FOREIGN KEY ("leadId") REFERENCES "Lead" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Sale_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "Sale_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Sale_referralCodeId_fkey" FOREIGN KEY ("referralCodeId") REFERENCES "ReferralCode" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
+
+    CONSTRAINT "Sale_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Commission" (
     "saleId" TEXT NOT NULL,
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "affiliateId" TEXT NOT NULL,
     "customerId" TEXT NOT NULL,
     "serviceId" TEXT NOT NULL,
     "saleAmountCents" INTEGER NOT NULL,
     "commissionAmountCents" INTEGER NOT NULL,
     "commissionType" TEXT NOT NULL,
-    "commissionRate" REAL,
+    "commissionRate" DOUBLE PRECISION,
     "referralCode" TEXT,
     "attributionMethod" TEXT,
     "status" TEXT NOT NULL DEFAULT 'PENDING',
-    "approvedAt" DATETIME,
+    "approvedAt" TIMESTAMP(3),
     "approvedById" TEXT,
-    "rejectedAt" DATETIME,
+    "rejectedAt" TIMESTAMP(3),
     "rejectionReason" TEXT,
-    "cancelledAt" DATETIME,
+    "cancelledAt" TIMESTAMP(3),
     "cancellationReason" TEXT,
-    "paidAt" DATETIME,
+    "paidAt" TIMESTAMP(3),
     "payoutId" TEXT,
     "internalNotes" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "Commission_saleId_fkey" FOREIGN KEY ("saleId") REFERENCES "Sale" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "Commission_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "Commission_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "Commission_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "Commission_payoutId_fkey" FOREIGN KEY ("payoutId") REFERENCES "Payout" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Commission_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Payout" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "reference" TEXT NOT NULL,
     "affiliateId" TEXT NOT NULL,
     "amountCents" INTEGER NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'REQUESTED',
     "method" TEXT,
     "methodDetailsSnapshot" TEXT,
-    "requestedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "approvedAt" DATETIME,
+    "requestedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "approvedAt" TIMESTAMP(3),
     "approvedById" TEXT,
-    "paidAt" DATETIME,
+    "paidAt" TIMESTAMP(3),
     "paidById" TEXT,
-    "rejectedAt" DATETIME,
+    "rejectedAt" TIMESTAMP(3),
     "rejectionReason" TEXT,
     "transactionReference" TEXT,
     "notes" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "Payout_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Payout_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "PayoutStatusHistory" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "payoutId" TEXT NOT NULL,
     "fromStatus" TEXT,
     "toStatus" TEXT NOT NULL,
     "note" TEXT,
     "actorId" TEXT,
     "actorEmail" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "PayoutStatusHistory_payoutId_fkey" FOREIGN KEY ("payoutId") REFERENCES "Payout" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "PayoutStatusHistory_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Notification" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "paramsJson" TEXT NOT NULL DEFAULT '{}',
     "link" TEXT,
     "severity" TEXT NOT NULL DEFAULT 'INFO',
-    "readAt" DATETIME,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "readAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "AffiliateResource" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "titleEn" TEXT NOT NULL,
     "titleEl" TEXT NOT NULL,
     "descriptionEn" TEXT NOT NULL,
@@ -317,13 +320,15 @@ CREATE TABLE "AffiliateResource" (
     "thumbnailUrl" TEXT,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "AffiliateResource_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ProgramSettings" (
-    "id" TEXT NOT NULL PRIMARY KEY DEFAULT 'singleton',
+    "id" TEXT NOT NULL DEFAULT 'singleton',
     "programName" TEXT NOT NULL DEFAULT 'NexusDevStudio Affiliates',
     "programActive" BOOLEAN NOT NULL DEFAULT true,
     "currency" TEXT NOT NULL DEFAULT 'EUR',
@@ -332,7 +337,7 @@ CREATE TABLE "ProgramSettings" (
     "domainFeeCents" INTEGER NOT NULL DEFAULT 1500,
     "defaultCommissionType" TEXT NOT NULL DEFAULT 'FIXED',
     "defaultCommissionFixedCents" INTEGER NOT NULL DEFAULT 2000,
-    "defaultCommissionPercent" REAL NOT NULL DEFAULT 10,
+    "defaultCommissionPercent" DOUBLE PRECISION NOT NULL DEFAULT 10,
     "termsUrl" TEXT NOT NULL DEFAULT '/terms',
     "privacyUrl" TEXT NOT NULL DEFAULT '/privacy',
     "contactEmail" TEXT NOT NULL DEFAULT 'hello@nexusdevstudio.com',
@@ -342,13 +347,15 @@ CREATE TABLE "ProgramSettings" (
     "termsContentEl" TEXT NOT NULL DEFAULT '',
     "privacyContentEn" TEXT NOT NULL DEFAULT '',
     "privacyContentEl" TEXT NOT NULL DEFAULT '',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ProgramSettings_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "AuditLog" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "actorUserId" TEXT,
     "actorEmail" TEXT,
     "actorRole" TEXT,
@@ -360,14 +367,17 @@ CREATE TABLE "AuditLog" (
     "metadata" TEXT,
     "ip" TEXT,
     "userAgent" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "AuditLog_actorUserId_fkey" FOREIGN KEY ("actorUserId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "AuditLog_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Counter" (
-    "name" TEXT NOT NULL PRIMARY KEY,
-    "value" INTEGER NOT NULL DEFAULT 0
+    "name" TEXT NOT NULL,
+    "value" INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT "Counter_pkey" PRIMARY KEY ("name")
 );
 
 -- CreateIndex
@@ -513,3 +523,87 @@ CREATE INDEX "AuditLog_entityType_entityId_idx" ON "AuditLog"("entityType", "ent
 
 -- CreateIndex
 CREATE INDEX "AuditLog_actorUserId_idx" ON "AuditLog"("actorUserId");
+
+-- AddForeignKey
+ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PasswordResetToken" ADD CONSTRAINT "PasswordResetToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Affiliate" ADD CONSTRAINT "Affiliate_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AffiliateSocialProfile" ADD CONSTRAINT "AffiliateSocialProfile_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ReferralCode" ADD CONSTRAINT "ReferralCode_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ReferralClick" ADD CONSTRAINT "ReferralClick_referralCodeId_fkey" FOREIGN KEY ("referralCodeId") REFERENCES "ReferralCode"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ReferralClick" ADD CONSTRAINT "ReferralClick_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Lead" ADD CONSTRAINT "Lead_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Lead" ADD CONSTRAINT "Lead_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Lead" ADD CONSTRAINT "Lead_referralCodeId_fkey" FOREIGN KEY ("referralCodeId") REFERENCES "ReferralCode"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Lead" ADD CONSTRAINT "Lead_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Customer" ADD CONSTRAINT "Customer_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Customer" ADD CONSTRAINT "Customer_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Customer" ADD CONSTRAINT "Customer_referralCodeId_fkey" FOREIGN KEY ("referralCodeId") REFERENCES "ReferralCode"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Sale" ADD CONSTRAINT "Sale_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Sale" ADD CONSTRAINT "Sale_leadId_fkey" FOREIGN KEY ("leadId") REFERENCES "Lead"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Sale" ADD CONSTRAINT "Sale_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Sale" ADD CONSTRAINT "Sale_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Sale" ADD CONSTRAINT "Sale_referralCodeId_fkey" FOREIGN KEY ("referralCodeId") REFERENCES "ReferralCode"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Commission" ADD CONSTRAINT "Commission_saleId_fkey" FOREIGN KEY ("saleId") REFERENCES "Sale"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Commission" ADD CONSTRAINT "Commission_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Commission" ADD CONSTRAINT "Commission_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Commission" ADD CONSTRAINT "Commission_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Commission" ADD CONSTRAINT "Commission_payoutId_fkey" FOREIGN KEY ("payoutId") REFERENCES "Payout"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Payout" ADD CONSTRAINT "Payout_affiliateId_fkey" FOREIGN KEY ("affiliateId") REFERENCES "Affiliate"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PayoutStatusHistory" ADD CONSTRAINT "PayoutStatusHistory_payoutId_fkey" FOREIGN KEY ("payoutId") REFERENCES "Payout"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AuditLog" ADD CONSTRAINT "AuditLog_actorUserId_fkey" FOREIGN KEY ("actorUserId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

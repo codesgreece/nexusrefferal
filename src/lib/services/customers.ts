@@ -3,6 +3,7 @@ import "server-only";
 import type { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
+import { like } from "./query";
 import { AppError } from "@/lib/errors";
 import type { AttributionMethod, CustomerStatus } from "@/lib/domain";
 import type { SessionUser } from "@/lib/auth/session";
@@ -35,7 +36,7 @@ export async function findDuplicates(
       OR: [
         { email: normalizedEmail },
         ...(normalizedPhone && normalizedPhone.length >= 6
-          ? [{ phone: { contains: normalizedPhone.slice(-9) } }]
+          ? [{ phone: like(normalizedPhone.slice(-9)) }]
           : []),
       ],
     },
@@ -328,11 +329,11 @@ export async function listCustomers(filters: CustomerFilters) {
   }
   if (query) {
     where.OR = [
-      { fullName: { contains: query } },
-      { businessName: { contains: query } },
-      { email: { contains: query } },
-      { phone: { contains: query } },
-      { referralCode: { contains: query.toUpperCase() } },
+      { fullName: like(query) },
+      { businessName: like(query) },
+      { email: like(query) },
+      { phone: like(query) },
+      { referralCode: like(query) },
     ];
   }
 

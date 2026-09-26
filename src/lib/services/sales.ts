@@ -3,6 +3,7 @@ import "server-only";
 import type { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
+import { like } from "./query";
 import { AppError } from "@/lib/errors";
 import type { OrderStatus, PaymentStatus } from "@/lib/domain";
 import type { SessionUser } from "@/lib/auth/session";
@@ -363,11 +364,11 @@ export async function listSales(filters: SaleFilters, scopedAffiliateId?: string
   }
   if (query) {
     where.OR = [
-      { reference: { contains: query } },
-      { referralCode: { contains: query.toUpperCase() } },
-      { customer: { fullName: { contains: query } } },
-      { customer: { businessName: { contains: query } } },
-      { customer: { email: { contains: query } } },
+      { reference: like(query) },
+      { referralCode: like(query) },
+      { customer: { fullName: like(query) } },
+      { customer: { businessName: like(query) } },
+      { customer: { email: like(query) } },
     ];
   }
 

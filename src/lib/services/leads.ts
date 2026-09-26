@@ -3,6 +3,7 @@ import "server-only";
 import type { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
+import { like } from "./query";
 import { AppError } from "@/lib/errors";
 import { parseEurosToCents } from "@/lib/money";
 import type { AttributionMethod, LeadStatus } from "@/lib/domain";
@@ -527,7 +528,7 @@ export function buildLeadWhere(filters: LeadFilters, scopedAffiliateId?: string)
     where.attributionMethod = filters.attributionMethod;
   }
   if (filters.referralCode?.trim()) {
-    where.referralCodeRaw = { contains: filters.referralCode.trim().toUpperCase() };
+    where.referralCodeRaw = like(filters.referralCode.trim().toUpperCase());
   }
   if (filters.from || filters.to) {
     where.createdAt = {
@@ -537,12 +538,12 @@ export function buildLeadWhere(filters: LeadFilters, scopedAffiliateId?: string)
   }
   if (query) {
     where.OR = [
-      { reference: { contains: query } },
-      { customerName: { contains: query } },
-      { businessName: { contains: query } },
-      { email: { contains: query } },
-      { phone: { contains: query } },
-      { referralCodeRaw: { contains: query.toUpperCase() } },
+      { reference: like(query) },
+      { customerName: like(query) },
+      { businessName: like(query) },
+      { email: like(query) },
+      { phone: like(query) },
+      { referralCodeRaw: like(query) },
     ];
   }
   return where;

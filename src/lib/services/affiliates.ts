@@ -3,6 +3,7 @@ import "server-only";
 import type { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
+import { like } from "./query";
 import { AppError } from "@/lib/errors";
 import { hashPassword } from "@/lib/auth/password";
 import type { SessionUser } from "@/lib/auth/session";
@@ -546,10 +547,10 @@ export async function listAffiliates(filters: AffiliateListFilters) {
     ...(query
       ? {
           OR: [
-            { fullName: { contains: query } },
-            { email: { contains: query } },
-            { phone: { contains: query } },
-            { referralCodes: { some: { code: { contains: query.toUpperCase() } } } },
+            { fullName: like(query) },
+            { email: like(query) },
+            { phone: like(query) },
+            { referralCodes: { some: { code: like(query) } } },
           ],
         }
       : {}),

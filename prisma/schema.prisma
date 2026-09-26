@@ -1,16 +1,21 @@
 // NexusDevStudio Affiliates — relational schema.
 //
-// SQLite is the default datasource so the app runs with zero external services.
-// The schema is intentionally portable: no native enums (string unions validated
-// in the service layer instead) and all money is stored as integer euro cents.
+// PostgreSQL, so the same schema runs locally and on serverless hosts such as
+// Vercel. Status columns are stored as validated strings rather than native
+// enums: the allowed values live in src/lib/domain.ts and are enforced by zod
+// on every write, which keeps adding a status from being a schema migration.
+// All money is stored as integer euro cents — never a float.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  // Set DIRECT_URL when DATABASE_URL points at a connection pooler
+  // (Vercel Postgres, Neon, Supabase): migrations need a direct connection.
+  directUrl = env("DIRECT_URL")
 }
 
 // ---------------------------------------------------------------------------
