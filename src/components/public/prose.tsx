@@ -21,7 +21,6 @@ function renderInline(text: string, keyPrefix: string): React.ReactNode[] {
 
 export function LegalProse({ content }: { content: string }) {
   const blocks = content.split(/\n{2,}/).filter((block) => block.trim().length > 0);
-  let listCounter = 0;
 
   return (
     <div className="space-y-5">
@@ -42,7 +41,6 @@ export function LegalProse({ content }: { content: string }) {
         const lines = trimmed.split("\n");
         const numbered = lines.every((line) => /^\d+\.\s/.test(line.trim()));
         if (numbered && lines.length > 1) {
-          listCounter += 1;
           return (
             <ol key={blockIndex} className="space-y-3">
               {lines.map((line, lineIndex) => (
@@ -56,7 +54,7 @@ export function LegalProse({ content }: { content: string }) {
                   <span>
                     {renderInline(
                       line.trim().replace(/^\d+\.\s*/, ""),
-                      `${listCounter}-${lineIndex}`,
+                      `${blockIndex}-${lineIndex}`,
                     )}
                   </span>
                 </li>

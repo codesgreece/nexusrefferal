@@ -64,13 +64,13 @@ function CustomerFields({
     Array<{ id: string; fullName: string; email: string; phone: string | null }>
   >([]);
 
+  const canCheck = showDuplicateCheck && email.includes("@");
+  const visibleDuplicates = canCheck ? duplicates : [];
+
   // Duplicate detection runs while typing so the admin sees the clash before
   // submitting rather than as a rejection afterwards.
   React.useEffect(() => {
-    if (!showDuplicateCheck || !email.includes("@")) {
-      setDuplicates([]);
-      return;
-    }
+    if (!canCheck) return;
     let cancelled = false;
     const timer = setTimeout(async () => {
       const result = await checkDuplicateCustomerAction(email, phone || undefined);
@@ -80,14 +80,14 @@ function CustomerFields({
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [email, phone, showDuplicateCheck]);
+  }, [email, phone, canCheck]);
 
   return (
     <div className="space-y-5">
-      {duplicates.length > 0 ? (
+      {visibleDuplicates.length > 0 ? (
         <FormAlert tone="warning" message={t("admin.customers.duplicateWarning")}>
           <ul className="mt-1 space-y-1">
-            {duplicates.map((duplicate) => (
+            {visibleDuplicates.map((duplicate) => (
               <li key={duplicate.id} className="text-xs">
                 {duplicate.fullName} · {duplicate.email}
                 {duplicate.phone ? ` · ${duplicate.phone}` : ""}

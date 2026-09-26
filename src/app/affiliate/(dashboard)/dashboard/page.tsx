@@ -16,7 +16,7 @@ import { QuickActions } from "@/components/affiliate/quick-actions";
 import { ReferralCard } from "@/components/affiliate/referral-card";
 import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardBody, CardHeader } from "@/components/ui/card";
+import { Card, CardHeader } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatCard, StatGrid } from "@/components/ui/stat-card";
 import { requireActiveAffiliatePage } from "@/lib/auth/guards";

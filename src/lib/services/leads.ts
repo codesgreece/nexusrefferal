@@ -11,7 +11,7 @@ import type { SessionUser } from "@/lib/auth/session";
 import { recordAudit } from "./audit";
 import { notify, notifyAdmins } from "./notifications";
 import { nextReference } from "./references";
-import { NO_ATTRIBUTION, resolveAttributionForLead, resolveCode } from "./referral";
+import { NO_ATTRIBUTION, resolveAttributionForLead } from "./referral";
 import { getSettings } from "./settings";
 
 export type PublicLeadInput = {

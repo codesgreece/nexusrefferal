@@ -40,18 +40,21 @@ export function ContactForm({
     onSuccess: (data) => setSuccess(data),
   });
 
+  const normalizedCode = code.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const tooShort = normalizedCode.length < 3;
+  // A code that is too short to be valid never shows feedback, so the state is
+  // derived rather than written back from the effect.
+  const visibleCodeState: CodeState = tooShort ? { status: "idle" } : codeState;
+
   // Debounced server-side validation of the referral code.
   React.useEffect(() => {
-    const normalized = code.toUpperCase().replace(/[^A-Z0-9]/g, "");
-    if (normalized.length < 3) {
-      setCodeState({ status: "idle" });
-      return;
-    }
+    if (normalizedCode.length < 3) return;
 
     let cancelled = false;
-    setCodeState({ status: "checking" });
     const timer = setTimeout(async () => {
-      const result = await validateReferralCodeAction(normalized);
+      if (cancelled) return;
+      setCodeState({ status: "checking" });
+      const result = await validateReferralCodeAction(normalizedCode);
       if (cancelled) return;
       setCodeState(
         result.ok
@@ -64,7 +67,7 @@ export function ContactForm({
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [code]);
+  }, [normalizedCode]);
 
   if (success) {
     return (
@@ -219,24 +222,24 @@ export function ContactForm({
             spellCheck={false}
             maxLength={20}
             className="pr-11 font-mono tracking-[0.12em]"
-            aria-invalid={codeState.status === "invalid"}
+            aria-invalid={visibleCodeState.status === "invalid"}
           />
-          {codeState.status === "checking" ? (
+          {visibleCodeState.status === "checking" ? (
             <Loader2 className="absolute right-3.5 top-1/2 size-4 -translate-y-1/2 animate-spin text-muted" />
           ) : null}
-          {codeState.status === "valid" ? (
+          {visibleCodeState.status === "valid" ? (
             <BadgeCheck className="absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-positive" />
           ) : null}
         </div>
       </Field>
 
-      {codeState.status === "valid" ? (
+      {visibleCodeState.status === "valid" ? (
         <p className="flex items-center gap-1.5 text-xs text-positive">
           <BadgeCheck className="size-3.5" />
-          {t("contact.referralValid")} · {codeState.affiliateName}
+          {t("contact.referralValid")} · {visibleCodeState.affiliateName}
         </p>
       ) : null}
-      {codeState.status === "invalid" ? (
+      {visibleCodeState.status === "invalid" ? (
         <p className="text-xs text-caution">{t("contact.referralInvalid")}</p>
       ) : null}
 

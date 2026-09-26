@@ -77,17 +77,20 @@ function SaleFields({
   const { t, locale } = useI18n();
   const [customerId, setCustomerId] = React.useState(initial?.customerId ?? "");
   const [serviceId, setServiceId] = React.useState(initial?.serviceId ?? services[0]?.id ?? "");
-  const [amount, setAmount] = React.useState(initial?.amount ?? "");
+  const [editedAmount, setEditedAmount] = React.useState<string | null>(
+    initial?.amount ?? null,
+  );
   const [domainIncluded, setDomainIncluded] = React.useState(initial?.domainIncluded ?? false);
 
   const service = services.find((entry) => entry.id === serviceId);
   const customer = customers.find((entry) => entry.id === customerId);
 
-  // Default the amount to the service's published starting price.
-  React.useEffect(() => {
-    if (lockAmount || initial?.amount) return;
-    if (service) setAmount((service.startingPriceCents / 100).toFixed(2));
-  }, [service, lockAmount, initial?.amount]);
+  // Until the administrator types an amount, the field follows the selected
+  // service's published starting price. Derived, so switching service updates
+  // it without an effect writing back into state.
+  const amount =
+    editedAmount ?? (service ? (service.startingPriceCents / 100).toFixed(2) : "");
+  const setAmount = setEditedAmount;
 
   const amountCents = parseEurosToCents(amount) ?? 0;
   const totalCents = amountCents + (domainIncluded ? domainFeeCents : 0);
