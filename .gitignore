@@ -47,3 +47,6 @@ next-env.d.ts
 # Prisma / SQLite
 prisma/*.db
 prisma/*.db-journal
+
+# Vercel CLI writes this when linking a project
+.vercel

@@ -41,7 +41,15 @@ const hasDatabase = Boolean(process.env.DATABASE_URL?.startsWith("postgres"));
 const env = { ...process.env };
 
 if (!hasDatabase) env.DATABASE_URL = PLACEHOLDER;
-if (!env.DIRECT_URL?.startsWith("postgres")) env.DIRECT_URL = env.DATABASE_URL;
+
+// Migrations want a direct connection. Neon and Vercel Postgres expose one as
+// DATABASE_URL_UNPOOLED, so it is picked up automatically; otherwise fall back
+// to DATABASE_URL so a single variable is enough.
+if (!env.DIRECT_URL?.startsWith("postgres")) {
+  env.DIRECT_URL = env.DATABASE_URL_UNPOOLED?.startsWith("postgres")
+    ? env.DATABASE_URL_UNPOOLED
+    : env.DATABASE_URL;
+}
 
 function run(args) {
   const result = spawnSync("npx", ["--no-install", "prisma", ...args], {
