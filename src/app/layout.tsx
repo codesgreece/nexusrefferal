@@ -1,13 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 
 import "./globals.css";
 import { I18nProvider } from "@/lib/i18n/provider";
 import { getLocale } from "@/lib/i18n/server";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin", "greek"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+// Inter and JetBrains Mono both ship Greek glyphs, which the UI needs since
+// Greek is the default language.
+const sans = Inter({
+  variable: "--font-sans-family",
+  subsets: ["latin", "latin-ext", "greek"],
+  display: "swap",
+});
+const mono = JetBrains_Mono({
+  variable: "--font-mono-family",
+  subsets: ["latin", "latin-ext", "greek"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -34,7 +44,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${sans.variable} ${mono.variable} antialiased`}>
         <I18nProvider locale={locale}>
           {children}
           <Toaster
