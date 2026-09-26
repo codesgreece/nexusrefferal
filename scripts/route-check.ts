@@ -76,14 +76,15 @@ function check(label: string, ok: boolean, detail?: unknown) {
   }
 }
 
+/** Sessions created by this run, so cleanup never touches anyone else's. */
+const createdSessionHashes: string[] = [];
+
 async function makeSession(userId: string) {
   const token = randomBytes(32).toString("base64url");
+  const tokenHash = createHash("sha256").update(token).digest("hex");
+  createdSessionHashes.push(tokenHash);
   await prisma.session.create({
-    data: {
-      tokenHash: createHash("sha256").update(token).digest("hex"),
-      userId,
-      expiresAt: new Date(Date.now() + 3_600_000),
-    },
+    data: { tokenHash, userId, expiresAt: new Date(Date.now() + 3_600_000) },
   });
   return `nds_session=${token}`;
 }
@@ -215,9 +216,11 @@ async function main() {
   }
 
   await prisma.$transaction([
+    prisma.auditLog.deleteMany({ where: { actorUserId: user.id } }),
     prisma.referralCode.deleteMany({ where: { affiliateId: affiliate.id } }),
     prisma.user.delete({ where: { id: user.id } }),
-    prisma.session.deleteMany({ where: { userId: admin.id } }),
+    // Only the sessions this run minted — never every session of the account.
+    prisma.session.deleteMany({ where: { tokenHash: { in: createdSessionHashes } } }),
   ]);
 
   console.log(`\n${passed} passed, ${failed} failed`);
