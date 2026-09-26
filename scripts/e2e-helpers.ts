@@ -34,6 +34,20 @@ async function actorFor(userId: string): Promise<Actor> {
   };
 }
 
+export async function submitPublicLead(input: {
+  customerName: string;
+  businessName?: string;
+  email: string;
+  phone?: string;
+  serviceId?: string;
+  message: string;
+  referralCode?: string;
+  cookieCode?: string | null;
+}) {
+  const { createPublicLead } = await import("../src/lib/services/leads");
+  return createPublicLead(input);
+}
+
 export async function confirmPaymentViaService(saleId: string, adminUserId: string) {
   const { confirmPayment } = await import("../src/lib/services/sales");
   const actor = await actorFor(adminUserId);

@@ -107,6 +107,36 @@ src/
   read, so they follow the reader's language rather than the language they were
   created in.
 
+## Verification
+
+Two scripts check the application against a running dev server. Both clean up
+after themselves, so neither leaves demo data behind.
+
+```bash
+npm run dev          # in one terminal
+npm run test:e2e     # the business flow, end to end
+npm run test:routes  # every route, both languages, both roles
+```
+
+`test:e2e` walks the full specified flow through the real service layer and the
+real HTTP surface: registration, an unapproved affiliate being held out of the
+dashboard, approval and referral-code generation, referral-link click tracking,
+public-form attribution by code and by cookie, rejection of an invalid code,
+self-referral blocking, manual attribution of a DM referral, customer
+conversion with duplicate detection, sale creation, payment confirmation
+generating exactly one commission, repeated confirmation being a no-op, the
+database refusing a second commission for the same sale, commission approval,
+the minimum-payout threshold, a payout bundling two commissions, approval and
+payment with an immutable status history, notifications, the audit trail, a
+refund cancelling an unpaid commission, and suspension stopping new
+attribution. It also asserts an affiliate cannot reach admin pages and is
+offered no approve control on their own commissions.
+
+`test:routes` requests all 34 routes as an administrator, as an approved
+affiliate and anonymously — including filtered and paginated variants and both
+locales — and asserts none render an error boundary, that cross-role access
+redirects, and that the security headers are present.
+
 ## Scripts
 
 | Script | Purpose |
@@ -120,6 +150,8 @@ src/
 | `npm run db:deploy` | Apply pending migrations. |
 | `npm run db:seed` | Idempotent seed. |
 | `npm run db:studio` | Prisma Studio. |
+| `npm run test:e2e` | End-to-end business flow against a running server. |
+| `npm run test:routes` | Route, locale and authorization coverage. |
 
 ## Notes for operators
 

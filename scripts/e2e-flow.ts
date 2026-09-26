@@ -281,6 +281,87 @@ async function main() {
   const invalidCode = await resolveCodeViaDb("TOTALLYFAKE");
   check("invalid code resolves to nothing", invalidCode === null);
 
+  // --- public lead capture -------------------------------------------------
+  section("Public lead form attribution");
+  const { submitPublicLead } = await import("./e2e-helpers");
+
+  const withCode = await submitPublicLead({
+    customerName: "Code Lead",
+    email: `code.lead.e2e.${stamp}@example.com`,
+    message: "Found you through a referral code.",
+    referralCode: REFERRAL_CODE.toLowerCase(),
+  });
+  check("lead submitted with a lower-case code is attributed", withCode.attributed);
+  check("attributed affiliate name returned", withCode.affiliateName === "Maria E2E");
+  const codeLead = await prisma.lead.findFirstOrThrow({
+    where: { reference: withCode.reference },
+  });
+  check("code attribution method is REFERRAL_CODE", codeLead.attributionMethod === "REFERRAL_CODE");
+  check("stored code is normalized to upper case", codeLead.referralCodeRaw === REFERRAL_CODE);
+
+  const withCookie = await submitPublicLead({
+    customerName: "Cookie Lead",
+    email: `cookie.lead.e2e.${stamp}@example.com`,
+    message: "Arrived through a referral link.",
+    cookieCode: REFERRAL_CODE,
+  });
+  check("lead from the referral cookie is attributed", withCookie.attributed);
+  const cookieLead = await prisma.lead.findFirstOrThrow({
+    where: { reference: withCookie.reference },
+  });
+  check(
+    "cookie attribution method is REFERRAL_LINK",
+    cookieLead.attributionMethod === "REFERRAL_LINK",
+  );
+
+  const withoutCode = await submitPublicLead({
+    customerName: "Plain Lead",
+    email: `plain.lead.e2e.${stamp}@example.com`,
+    message: "No referral at all.",
+  });
+  check("lead without a code is created unattributed", !withoutCode.attributed);
+
+  const badCode = await submitPublicLead({
+    customerName: "Bad Code Lead",
+    email: `bad.lead.e2e.${stamp}@example.com`,
+    message: "Typed the wrong code.",
+    referralCode: "NOSUCHCODE",
+  })
+    .then(() => "created")
+    .catch((error: { key?: string }) => error.key);
+  check(
+    "an invalid explicit code is rejected instead of guessed",
+    badCode === "errors.referralCodeInvalid",
+    badCode,
+  );
+
+  const selfReferral = await submitPublicLead({
+    customerName: "Maria Herself",
+    email: AFFILIATE_EMAIL,
+    message: "Trying to refer myself.",
+    referralCode: REFERRAL_CODE,
+  })
+    .then(() => "created")
+    .catch((error: { key?: string }) => error.key);
+  check("self-referral is blocked", selfReferral === "errors.selfReferral", selfReferral);
+
+  const adminLeadNotice = await prisma.notification.count({
+    where: { userId: admin.id, type: "ADMIN_NEW_LEAD" },
+  });
+  check("admin is notified about new public leads", adminLeadNotice > 0);
+
+  const affiliateLeadNotice = await prisma.notification.count({
+    where: { userId: user.id, type: "LEAD_ATTRIBUTED" },
+  });
+  check("affiliate is notified when a lead is attributed", affiliateLeadNotice > 0);
+
+  const references = [withCode.reference, withCookie.reference, withoutCode.reference];
+  check(
+    "each lead received a unique sequential reference",
+    new Set(references).size === 3 && references.every((ref) => /^LD-\d{6}$/.test(ref)),
+    references,
+  );
+
   // --- lead with manual attribution ---------------------------------------
   section("Lead creation and manual attribution");
   const counter = await prisma.counter.upsert({
@@ -724,7 +805,9 @@ async function main() {
     prisma.commission.deleteMany({ where: { affiliateId: affiliate.id } }),
     prisma.payout.deleteMany({ where: { affiliateId: affiliate.id } }),
     prisma.sale.deleteMany({ where: { affiliateId: affiliate.id } }),
-    prisma.lead.deleteMany({ where: { affiliateId: affiliate.id } }),
+    prisma.lead.deleteMany({
+      where: { OR: [{ affiliateId: affiliate.id }, { email: { contains: ".e2e." } }] },
+    }),
     prisma.customer.deleteMany({ where: { email: { contains: ".e2e." } } }),
     prisma.referralClick.deleteMany({ where: { affiliateId: affiliate.id } }),
     prisma.auditLog.deleteMany({ where: { actorUserId: user.id } }),
