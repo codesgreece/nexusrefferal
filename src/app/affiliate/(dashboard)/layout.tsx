@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 import { AppShell, type NavItem } from "@/components/layout/app-shell";
-import { requireAffiliatePage } from "@/lib/auth/guards";
+import { requireActiveAffiliatePage } from "@/lib/auth/guards";
 import { getI18n } from "@/lib/i18n/server";
 import {
   countUnread,
@@ -23,7 +23,9 @@ export default async function AffiliateDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await requireAffiliatePage();
+  // Enforced in the layout rather than each page so an unapproved affiliate is
+  // redirected with a real 307 before any dashboard markup is streamed.
+  const user = await requireActiveAffiliatePage();
   const { t } = await getI18n();
 
   const [rawNotifications, unreadCount] = await Promise.all([

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { PageHeader } from "@/components/layout/app-shell";
 import { NotificationList } from "@/components/layout/notification-list";
-import { requireAffiliatePage } from "@/lib/auth/guards";
+import { requireActiveAffiliatePage } from "@/lib/auth/guards";
 import { getI18n } from "@/lib/i18n/server";
 import {
   countUnread,
@@ -13,7 +13,7 @@ import {
 export const metadata: Metadata = { title: "Notifications" };
 
 export default async function AffiliateNotificationsPage() {
-  const user = await requireAffiliatePage();
+  const user = await requireActiveAffiliatePage();
   const { t } = await getI18n();
 
   const [raw, unreadCount] = await Promise.all([

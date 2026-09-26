@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { PageHeader } from "@/components/layout/app-shell";
 import { ReferralCard } from "@/components/affiliate/referral-card";
-import { requireAffiliatePage } from "@/lib/auth/guards";
+import { requireActiveAffiliatePage } from "@/lib/auth/guards";
 import { getI18n } from "@/lib/i18n/server";
 import { getAffiliateContext } from "@/lib/services/affiliate-context";
 import { getSettings } from "@/lib/services/settings";
@@ -11,11 +11,11 @@ import { ChangePasswordForm, PayoutDetailsForm, ProfileForm } from "./profile-fo
 export const metadata: Metadata = { title: "Profile" };
 
 export default async function AffiliateProfilePage() {
-  const user = await requireAffiliatePage();
+  const user = await requireActiveAffiliatePage();
   const { t } = await getI18n();
 
   const [context, settings] = await Promise.all([
-    getAffiliateContext(user.affiliateId!),
+    getAffiliateContext(user.affiliateId),
     getSettings(),
   ]);
   const { affiliate } = context;
