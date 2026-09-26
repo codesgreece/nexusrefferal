@@ -4,9 +4,9 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { ChevronDown, LogOut, Menu, User as UserIcon, X } from "lucide-react";
+import { ChevronDown, Menu, User as UserIcon, X } from "lucide-react";
 
-import { logoutAction } from "@/app/actions/auth";
+import { LogoutButton } from "@/components/layout/logout-button";
 import { Logo } from "@/components/brand/logo";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { NotificationBell } from "@/components/layout/notification-bell";
@@ -119,16 +119,10 @@ function UserMenu({
             </Link>
           </DropdownMenu.Item>
           <DropdownMenu.Separator className="my-1 h-px bg-white/8" />
-          <DropdownMenu.Item asChild>
-            <form action={logoutAction}>
-              <button
-                type="submit"
-                className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-danger outline-none transition-colors data-highlighted:bg-danger/12"
-              >
-                <LogOut className="size-4" />
-                {t("common.logout")}
-              </button>
-            </form>
+          {/* Keeping the menu open means the button is still mounted while the
+              sign-out request is in flight. */}
+          <DropdownMenu.Item asChild onSelect={(event) => event.preventDefault()}>
+            <LogoutButton variant="menu" />
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
@@ -204,15 +198,7 @@ export function AppShell({
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">{sidebar()}</div>
         <div className="shrink-0 border-t border-white/8 p-3">
-          <form action={logoutAction}>
-            <button
-              type="submit"
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted transition-colors hover:bg-danger/10 hover:text-danger"
-            >
-              <LogOut className="size-4.5" />
-              {t("common.logout")}
-            </button>
-          </form>
+          <LogoutButton />
         </div>
       </aside>
 
@@ -267,6 +253,9 @@ export function AppShell({
               </div>
               <div className="min-h-0 flex-1 overflow-y-auto">
                 {sidebar(() => setMobileOpen(false))}
+              </div>
+              <div className="shrink-0 border-t border-white/8 p-3">
+                <LogoutButton />
               </div>
             </div>
           </div>

@@ -1,7 +1,6 @@
 "use server";
 
 import { createHash, randomBytes } from "node:crypto";
-import { redirect } from "next/navigation";
 import { cookies, headers } from "next/headers";
 
 import { prisma } from "@/lib/db";
@@ -113,9 +112,18 @@ export async function loginAction(
   }
 }
 
-export async function logoutAction() {
-  await destroySession();
-  redirect("/login");
+/**
+ * Destroys the session and reports back instead of redirecting. The caller
+ * navigates, which keeps the outcome deterministic when the control lives
+ * inside a popover that unmounts on click.
+ */
+export async function logoutAction(): Promise<ActionResult> {
+  try {
+    await destroySession();
+    return actionOk();
+  } catch (error) {
+    return toActionError(error);
+  }
 }
 
 export async function registerAffiliateAction(

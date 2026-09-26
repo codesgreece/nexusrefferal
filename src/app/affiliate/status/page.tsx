@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Clock, LogOut, ShieldAlert, XCircle } from "lucide-react";
+import { Clock, ShieldAlert, XCircle } from "lucide-react";
 
-import { logoutAction } from "@/app/actions/auth";
+import { LogoutButton } from "@/components/layout/logout-button";
 import { Logo } from "@/components/brand/logo";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { Button } from "@/components/ui/button";
@@ -81,12 +81,7 @@ export default async function AffiliateStatusPage() {
         <Logo href="/" />
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
-          <form action={logoutAction}>
-            <Button type="submit" variant="ghost" size="sm">
-              <LogOut />
-              <span className="hidden sm:inline">{t("common.logout")}</span>
-            </Button>
-          </form>
+          <LogoutButton variant="menu" className="w-auto" />
         </div>
       </header>
 
